@@ -9,30 +9,34 @@ from MathGenerator.arithmetic.factories import (AdditionFactory,
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.parametrize("factory, level", [
-    (AdditionFactory(), 5),
-    (AdditionFactory(), 3),
-    (SubtractionFactory(), 6),
-    (SubtractionFactory(), 3),
-    (MultiplicationFactory(), 3),
-    (MultiplicationFactory(), 5),
+@pytest.mark.parametrize("factory, level, expected_component_amount", [
+    (AdditionFactory(), 5, 3),
+    (AdditionFactory(), 3, 2),
+    (SubtractionFactory(), 6, 3),
+    (SubtractionFactory(), 3, 2),
+    (MultiplicationFactory(), 3, 2),
+    (MultiplicationFactory(), 5, 3),
+    # Always 2 components expected in division
+    (DivisionFactory(), 3, 2),
+    (DivisionFactory(), 4, 2),
+    (DivisionFactory(), 5, 2),
 ])
-def test_arithmetic_generate(factory, level):
+def test_arithmetic_generate(factory, level, expected_component_amount):
     amount = random.randint(1, 10)
-    exercises = factory.generate(level, amount)
+    exercises = factory.generate(level=level, amount=amount)
 
     # First, check if the amount of generated exercises matches the expected amount
     assert len(exercises) == amount
 
-    #
     for exercise in exercises:
+
         # Validate operator
         assert factory.operator_symbol.strip() in exercise
 
         # Check amount of components in exercise
         components = exercise.split(factory.operator_symbol)
-        component_count = 3 if level > 4 else 2
-        assert len(components) == component_count
+        assert len(components) == expected_component_amount
+
         # Validate components
         assert all(component.isdigit() for component in components)
 
@@ -45,4 +49,3 @@ def test_arithmetic_generate(factory, level):
 ])
 def test_arithmetic_solve(factory, exercises, expected_results):
     assert factory.solve(exercises) == expected_results
-
