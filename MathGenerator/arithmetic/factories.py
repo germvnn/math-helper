@@ -10,7 +10,7 @@ class ArithmeticFactory(ExerciseFactory):
         self.operator = f" {operator} "
         self.number_generator = number_generator
 
-    def generate(self, level: int, amount: int):
+    def generate(self, level: int, amount: int) -> list:
         questions = []
         max_number = 10 ** level
 
@@ -22,7 +22,7 @@ class ArithmeticFactory(ExerciseFactory):
 
         return questions
 
-    def solve(self, exercise: str):
+    def solve(self, exercise: str) -> list:
         pass
 
 
