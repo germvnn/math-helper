@@ -1,5 +1,5 @@
 import pytest
-from MathGenerator.arithmetic.addition import AdditionFactory
+from MathGenerator.arithmetic.factories import AdditionFactory
 
 
 @pytest.mark.parametrize("level, amount, component_count", [
