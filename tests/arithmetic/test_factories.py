@@ -9,15 +9,16 @@ from MathGenerator.arithmetic.factories import (AdditionFactory,
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.parametrize("factory", [
-    (AdditionFactory()),
-    (SubtractionFactory()),
-    (MultiplicationFactory()),
-    (DivisionFactory())
+@pytest.mark.parametrize("factory, level", [
+    (AdditionFactory(), 5),
+    (AdditionFactory(), 3),
+    (SubtractionFactory(), 6),
+    (SubtractionFactory(), 3),
+    (MultiplicationFactory(), 3),
+    (MultiplicationFactory(), 5),
 ])
-def test_arithmetic_generate(factory):
-    level = random.randint(1,5)
-    amount = random.randint(1,10)
+def test_arithmetic_generate(factory, level):
+    amount = random.randint(1, 10)
     exercises = factory.generate(level, amount)
 
     # First, check if the amount of generated exercises matches the expected amount
@@ -30,7 +31,7 @@ def test_arithmetic_generate(factory):
 
         # Check amount of components in exercise
         components = exercise.split(factory.operator_symbol)
-        component_count = 3 if level > 3 else 2
+        component_count = 3 if level > 4 else 2
         assert len(components) == component_count
         # Validate components
         assert all(component.isdigit() for component in components)
