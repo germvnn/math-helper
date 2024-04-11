@@ -1,9 +1,12 @@
+import logging
 import pytest
 import random
 from MathGenerator.arithmetic.factories import (AdditionFactory,
                                                 SubtractionFactory,
                                                 MultiplicationFactory,
                                                 DivisionFactory)
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("factory", [
