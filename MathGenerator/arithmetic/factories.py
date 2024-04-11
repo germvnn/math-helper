@@ -75,9 +75,53 @@ class DivisionFactory(ArithmeticFactory):
         return exercises
 
 
+class FractionFactory(ArithmeticFactory):
+
+    def solve(self, exercises: list) -> list:
+        solutions = []
+        for exercise in exercises:
+            components = [float(component) for component in exercise.split(self.operator_symbol)]
+
+            result = components[0]
+            for component in components[1:]:
+                result = self.operator_function(result, component)
+
+            solutions.append(round(result, 3))
+
+        return solutions
+
+
+class FractionAdditionFactory(FractionFactory, AdditionFactory):
+
+    def __init__(self):
+        super().__init__()
+        self.number_generator = lambda a, b: random.randint(a, b) / 100
+
+
+class FractionSubtractionFactory(FractionFactory, SubtractionFactory):
+
+    def __init__(self):
+        super().__init__()
+        self.number_generator = lambda a, b: random.randint(a, b) / 100
+
+
+class FractionMultiplicationFactory(FractionFactory, MultiplicationFactory):
+
+    def __init__(self):
+        super().__init__()
+        self.number_generator = lambda a, b: random.randint(a, b) / 10
+
+
+class FractionDivisionFactory(FractionFactory, DivisionFactory):
+
+    def __init__(self):
+        super().__init__()
+        self.number_generator = lambda a, b: random.randint(a, b) / 10
+
+
 if __name__ == "__main__":
-    generator = MultiplicationFactory()
-    examples = generator.generate(level=1, amount=100)
+    generator = FractionDivisionFactory()
+    examples = generator.generate(level=4, amount=10)
     results = generator.solve(exercises=examples)
 
     print(f"Exercises: {examples} \nTheir solutions: {results}")
