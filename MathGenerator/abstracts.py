@@ -12,9 +12,9 @@ class ExerciseFactory(ABC):
         super().__init__()
 
     @abstractmethod
-    def generate(self, level):
+    def generate(self, level: int, amount: int):
         pass
 
     @abstractmethod
-    def solve(self):
+    def solve(self, exercise):
         pass
