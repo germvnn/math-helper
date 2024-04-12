@@ -6,6 +6,10 @@ from MathGenerator.abstracts import ExerciseFactory
 
 class ArithmeticFactory(ExerciseFactory):
     """Class for generating and solving arithmetic exercises"""
+
+    number_type = int
+    result_format = staticmethod(lambda x: x)
+
     def __init__(self, operator_symbol, number_generator):
         super().__init__()
         self.operator_symbol = f" {operator_symbol} "
@@ -32,13 +36,13 @@ class ArithmeticFactory(ExerciseFactory):
     def solve(self, exercises: list) -> dict:
         solutions = {}
         for exercise in exercises:
-            components = [int(component) for component in exercise.split(self.operator_symbol)]
+            components = [self.number_type(component) for component in exercise.split(self.operator_symbol)]
 
             result = components[0]
             for component in components[1:]:
                 result = self.operator_function(result, component)
 
-            solutions[exercise] = result
+            solutions[exercise] = self.result_format(result)
 
         return solutions
 
@@ -77,18 +81,8 @@ class DivisionFactory(ArithmeticFactory):
 
 class FractionFactory(ArithmeticFactory):
 
-    def solve(self, exercises: list) -> dict:
-        solutions = {}
-        for exercise in exercises:
-            components = [float(component) for component in exercise.split(self.operator_symbol)]
-
-            result = components[0]
-            for component in components[1:]:
-                result = self.operator_function(result, component)
-
-            solutions[exercise] = round(result, 3)
-
-        return solutions
+    number_type = float
+    result_format = staticmethod(lambda x: round(x, 3))
 
 
 class FractionAdditionFactory(FractionFactory, AdditionFactory):
