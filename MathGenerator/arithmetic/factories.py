@@ -9,8 +9,9 @@ class ArithmeticFactory(ExerciseFactory):
 
     number_type = int
     result_format = staticmethod(lambda x: x)
+    number_generator = random.randint
 
-    def __init__(self, operator_symbol, number_generator):
+    def __init__(self, operator_symbol):
         super().__init__()
         self.operator_symbol = f" {operator_symbol} "
         self.operator_function = {
@@ -19,7 +20,6 @@ class ArithmeticFactory(ExerciseFactory):
             '*': operator.mul,
             '/': operator.truediv
         }[operator_symbol]
-        self.number_generator = number_generator
 
     def generate(self, level: int, amount: int) -> list:
         exercises = []
@@ -49,22 +49,25 @@ class ArithmeticFactory(ExerciseFactory):
 
 class AdditionFactory(ArithmeticFactory):
     def __init__(self):
-        super().__init__(operator_symbol="+", number_generator=random.randint)
+        super().__init__(operator_symbol="+")
 
 
 class SubtractionFactory(ArithmeticFactory):
     def __init__(self):
-        super().__init__(operator_symbol="-", number_generator=random.randint)
+        super().__init__(operator_symbol="-")
 
 
 class MultiplicationFactory(ArithmeticFactory):
+
+    number_generator = staticmethod(lambda a, b: random.randint(a, round((b / 5) + a)))
+
     def __init__(self):
-        super().__init__(operator_symbol="*", number_generator=lambda a, b: random.randint(a, round((b / 5) + a)))
+        super().__init__(operator_symbol="*")
 
 
 class DivisionFactory(ArithmeticFactory):
     def __init__(self):
-        super().__init__(operator_symbol="/", number_generator=random.randint)
+        super().__init__(operator_symbol="/")
 
     def generate(self, level: int, amount: int) -> list:
         exercises = []
@@ -83,34 +86,23 @@ class FractionFactory(ArithmeticFactory):
 
     number_type = float
     result_format = staticmethod(lambda x: round(x, 3))
+    number_generator = staticmethod(lambda a, b: random.randint(a, b) / 100)
 
 
 class FractionAdditionFactory(FractionFactory, AdditionFactory):
-
-    def __init__(self):
-        super().__init__()
-        self.number_generator = lambda a, b: random.randint(a, b) / 100
+    pass
 
 
 class FractionSubtractionFactory(FractionFactory, SubtractionFactory):
-
-    def __init__(self):
-        super().__init__()
-        self.number_generator = lambda a, b: random.randint(a, b) / 100
+    pass
 
 
 class FractionMultiplicationFactory(FractionFactory, MultiplicationFactory):
-
-    def __init__(self):
-        super().__init__()
-        self.number_generator = lambda a, b: random.randint(a, b) / 10
+    number_generator = staticmethod(lambda a, b: random.randint(a, b) / 10)
 
 
 class FractionDivisionFactory(FractionFactory, DivisionFactory):
-
-    def __init__(self):
-        super().__init__()
-        self.number_generator = lambda a, b: random.randint(a, b) / 10
+    number_generator = staticmethod(lambda a, b: random.randint(a, b) / 10)
 
 
 if __name__ == "__main__":
