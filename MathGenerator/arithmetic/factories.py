@@ -1,3 +1,4 @@
+# TODO: Implement operations for %
 import operator
 import random
 
@@ -5,7 +6,39 @@ from MathGenerator.abstracts import ExerciseFactory
 
 
 class ArithmeticFactory(ExerciseFactory):
-    """Class for generating and solving arithmetic exercises"""
+    """
+    A class for generating and solving arithmetic exercises, supporting basic
+    arithmetic operations such as addition, subtraction, multiplication, and division.
+
+    Attributes:
+        number_type (type): The data type for the components of arithmetic expressions,
+                            default is int.
+        result_format (function): A static method that formats the output of calculations.
+                                  By default, it returns the result unchanged.
+        number_generator (function): A function to generate integer numbers. By default,
+                                     it uses random.randint.
+        operator_symbol (str): The symbol of the operator used to create exercises.
+        operator_function (dict): A dictionary mapping operator symbols to corresponding
+                                  arithmetic functions (operator.add, operator.sub,
+                                  operator.mul, operator.truediv).
+
+    Methods:
+        __init__(self, operator_symbol):
+            Initializes the ArithmeticFactory with the specified operator symbol.
+
+        generate(self, level: int, amount: int) -> list:
+            Generates a list of arithmetic exercises. The complexity and quantity of
+            exercises are determined by the `level` and `amount` parameters.
+            - level (int): The difficulty level of the exercises, affecting the maximum
+                           numbers used in exercises.
+            - amount (int): The number of exercises to generate.
+
+        solve(self, exercises: list) -> dict:
+            Solves a list of arithmetic exercises provided in `exercises`. Returns a
+            dictionary where keys are the exercises and values are the solutions.
+            - exercises (list): A list of string expressions representing the arithmetic
+                                problems to solve.
+    """
 
     number_type = int
     result_format = staticmethod(lambda x: x)
@@ -48,17 +81,21 @@ class ArithmeticFactory(ExerciseFactory):
 
 
 class AdditionFactory(ArithmeticFactory):
+    """Class for managing Addition exercises"""
     def __init__(self):
         super().__init__(operator_symbol="+")
 
 
 class SubtractionFactory(ArithmeticFactory):
+    """Class for managing Subtraction exercises"""
     def __init__(self):
         super().__init__(operator_symbol="-")
 
 
 class MultiplicationFactory(ArithmeticFactory):
+    """Class for managing Multiplication exercises"""
 
+    # Set other generator to adjust difficulty
     number_generator = staticmethod(lambda a, b: random.randint(a, round((b / 5) + a)))
 
     def __init__(self):
@@ -66,9 +103,11 @@ class MultiplicationFactory(ArithmeticFactory):
 
 
 class DivisionFactory(ArithmeticFactory):
+    """Class for managing Division exercises"""
     def __init__(self):
         super().__init__(operator_symbol="/")
 
+    # Override generate method to achieve smaller divisor
     def generate(self, level: int, amount: int) -> list:
         exercises = []
         max_number = 10 ** level
@@ -83,10 +122,15 @@ class DivisionFactory(ArithmeticFactory):
 
 
 class FractionFactory(ArithmeticFactory):
-
+    """Subclass for managing Fractions operations"""
     number_type = float
+
+    # Situations like 1 + 2 = 2.9999999997 avoidance
     result_format = staticmethod(lambda x: round(x, 3))
     number_generator = staticmethod(lambda a, b: random.randint(a, b) / 100)
+
+
+""" These are self-explanatory"""
 
 
 class FractionAdditionFactory(FractionFactory, AdditionFactory):
