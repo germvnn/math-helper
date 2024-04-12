@@ -73,15 +73,26 @@ def test_fraction_arithmetic_generate(factory, level, expected_component_amount,
                 f"Component {component} > {max_number}"
 
 
-@pytest.mark.parametrize("factory, exercises, expected_results", [
-    (f.AdditionFactory(), ['7712 + 2211 + 2458', '9209 + 5627 + 16'], [12381, 14852]),
-    (f.SubtractionFactory(), ['58 - 1', '33 - 11', '75 - 64', '62 - 32', '47 - 22'], [57, 22, 11, 30, 25]),
-    (f.MultiplicationFactory(), ['94 * 742', '5 * 589', '314 * 6'], [69748, 2945, 1884]),
-    (f.DivisionFactory(), ['256 / 16', '1000 / 10', '333 / 111'], [16, 100, 3]),
-    (f.FractionAdditionFactory(), ['6.91 + 1.95', '7.21 + 2.2', '0.92 + 3.21'], [8.86, 9.41, 4.13]),
-    (f.FractionSubtractionFactory(), ['14.5 - 11.12', '57.82 - 34.5', '51.78 - 65.06'], [3.38, 23.32, -13.28]),
-    (f.FractionMultiplicationFactory(), ['6.7 * 49.4', '69.6 * 34.2', '10.3 * 99.7'], [330.98, 2380.32, 1026.91]),
-    (f.FractionDivisionFactory(), ['182.4 / 4.3', '663.9 / 7.4', '275.8 / 8.8'], [42.419, 89.716, 31.341]),
+@pytest.mark.parametrize("factory, exercises_results", [
+    (f.AdditionFactory(),
+     {'7712 + 2211 + 2458': 12381, '9209 + 5627 + 16': 14852}),
+    (f.SubtractionFactory(),
+     {'58 - 1': 57, '33 - 11': 22, '75 - 64': 11, '62 - 32': 30, '47 - 22': 25}),
+    (f.MultiplicationFactory(),
+     {'94 * 742': 69748, '5 * 589': 2945, '314 * 6': 1884}),
+    (f.DivisionFactory(),
+     {'256 / 16': 16, '1000 / 10': 100, '333 / 111': 3}),
+    (f.FractionAdditionFactory(),
+     {'6.91 + 1.95': 8.86, '7.21 + 2.2': 9.41, '0.92 + 3.21': 4.13}),
+    (f.FractionSubtractionFactory(),
+     {'14.5 - 11.12': 3.38, '57.82 - 34.5': 23.32, '51.78 - 65.06': -13.28}),
+    (f.FractionMultiplicationFactory(),
+     {'6.7 * 49.4': 330.98, '69.6 * 34.2': 2380.32, '10.3 * 99.7': 1026.91}),
+    (f.FractionDivisionFactory(),
+     {'182.4 / 4.3': 42.419, '663.9 / 7.4': 89.716, '275.8 / 8.8': 31.341}),
 ])
-def test_arithmetic_solve(factory, exercises, expected_results):
-    assert factory.solve(exercises) == expected_results, f"Expected results: {expected_results}"
+def test_arithmetic_solve(factory, exercises_results):
+    for exercise, expected_result in exercises_results.items():
+        result = factory.solve([exercise])[exercise]
+        assert result == expected_result, f"Failed at {exercise}: got {result}, expected {expected_result}"
+

@@ -29,8 +29,8 @@ class ArithmeticFactory(ExerciseFactory):
 
         return exercises
 
-    def solve(self, exercises: list) -> list:
-        solutions = []
+    def solve(self, exercises: list) -> dict:
+        solutions = {}
         for exercise in exercises:
             components = [int(component) for component in exercise.split(self.operator_symbol)]
 
@@ -38,7 +38,7 @@ class ArithmeticFactory(ExerciseFactory):
             for component in components[1:]:
                 result = self.operator_function(result, component)
 
-            solutions.append(result)
+            solutions[exercise] = result
 
         return solutions
 
@@ -77,8 +77,8 @@ class DivisionFactory(ArithmeticFactory):
 
 class FractionFactory(ArithmeticFactory):
 
-    def solve(self, exercises: list) -> list:
-        solutions = []
+    def solve(self, exercises: list) -> dict:
+        solutions = {}
         for exercise in exercises:
             components = [float(component) for component in exercise.split(self.operator_symbol)]
 
@@ -86,7 +86,7 @@ class FractionFactory(ArithmeticFactory):
             for component in components[1:]:
                 result = self.operator_function(result, component)
 
-            solutions.append(round(result, 3))
+            solutions[exercise] = round(result, 3)
 
         return solutions
 
@@ -120,8 +120,8 @@ class FractionDivisionFactory(FractionFactory, DivisionFactory):
 
 
 if __name__ == "__main__":
-    generator = FractionDivisionFactory()
-    examples = generator.generate(level=4, amount=10)
+    generator = FractionAdditionFactory()
+    examples = generator.generate(level=1, amount=10)
     results = generator.solve(exercises=examples)
 
     print(f"Exercises: {examples} \nTheir solutions: {results}")
