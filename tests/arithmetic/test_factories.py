@@ -1,25 +1,22 @@
 import logging
 import pytest
 import random
-from MathGenerator.arithmetic.factories import (AdditionFactory,
-                                                SubtractionFactory,
-                                                MultiplicationFactory,
-                                                DivisionFactory)
+from MathGenerator.arithmetic import factories as f
 
 logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("factory, level, expected_component_amount", [
-    (AdditionFactory(), 5, 3),
-    (AdditionFactory(), 3, 2),
-    (SubtractionFactory(), 6, 3),
-    (SubtractionFactory(), 3, 2),
-    (MultiplicationFactory(), 3, 2),
-    (MultiplicationFactory(), 5, 3),
+    (f.AdditionFactory(), 5, 3),
+    (f.AdditionFactory(), 3, 2),
+    (f.SubtractionFactory(), 6, 3),
+    (f.SubtractionFactory(), 3, 2),
+    (f.MultiplicationFactory(), 3, 2),
+    (f.MultiplicationFactory(), 5, 3),
     # Always 2 components expected in division
-    (DivisionFactory(), 3, 2),
-    (DivisionFactory(), 4, 2),
-    (DivisionFactory(), 5, 2),
+    (f.DivisionFactory(), 3, 2),
+    (f.DivisionFactory(), 4, 2),
+    (f.DivisionFactory(), 5, 2),
 ])
 def test_arithmetic_generate(factory, level, expected_component_amount):
     amount = random.randint(1, 10)
@@ -42,10 +39,10 @@ def test_arithmetic_generate(factory, level, expected_component_amount):
 
 
 @pytest.mark.parametrize("factory, exercises, expected_results", [
-    (AdditionFactory(), ['7712 + 2211 + 2458', '9209 + 5627 + 16'], [12381, 14852]),
-    (SubtractionFactory(), ['58 - 1', '33 - 11', '75 - 64', '62 - 32', '47 - 22'], [57, 22, 11, 30, 25]),
-    (MultiplicationFactory(), ['94 * 742', '5 * 589', '314 * 6'], [69748, 2945, 1884]),
-    (DivisionFactory(), ['256 / 16', '1000 / 10', '333 / 111'], [16, 100, 3])
+    (f.AdditionFactory(), ['7712 + 2211 + 2458', '9209 + 5627 + 16'], [12381, 14852]),
+    (f.SubtractionFactory(), ['58 - 1', '33 - 11', '75 - 64', '62 - 32', '47 - 22'], [57, 22, 11, 30, 25]),
+    (f.MultiplicationFactory(), ['94 * 742', '5 * 589', '314 * 6'], [69748, 2945, 1884]),
+    (f.DivisionFactory(), ['256 / 16', '1000 / 10', '333 / 111'], [16, 100, 3])
 ])
 def test_arithmetic_solve(factory, exercises, expected_results):
     assert factory.solve(exercises) == expected_results
