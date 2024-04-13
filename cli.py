@@ -1,5 +1,6 @@
 import argparse
 from MathGenerator.arithmetic import factories as arithmetic
+from PDFGenerator.builder import Director, MathPDFBuilder
 
 
 class Factory:
@@ -39,8 +40,17 @@ def main():
     exercises = factory.generate(level=args.level, amount=args.amount)
     solutions = factory.solve(exercises=exercises)
 
-    print(f"Generated Exercises: {exercises}")
-    print(f"Their Solutions: {solutions}")
+    director = Director()
+    builder = MathPDFBuilder()
+    director.builder = builder
+
+    director.build_exercises(title=f"Exercises from {factory.__class__.__name__}",
+                             exercises=exercises,
+                             filename="exercises")
+
+    director.build_solutions(title=f"Solutions from {factory.__class__.__name__}",
+                             exercises=solutions,
+                             filename=f"solutions")
 
 
 if __name__ == "__main__":

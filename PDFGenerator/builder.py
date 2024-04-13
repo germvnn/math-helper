@@ -1,6 +1,14 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any
+from datetime import datetime
+
+from pylatex import (Document, NoEscape,
+                     StandAloneGraphic, LineBreak,
+                     Section, PageStyle,
+                     Head, MiniPage, Foot, LargeText)
+from pylatex.utils import bold
+
+from PDFGenerator import constants as const
 
 
 class PDFBuilder(ABC):
@@ -9,24 +17,23 @@ class PDFBuilder(ABC):
     interface for constructing PDF documents.
     """
 
-    @property
     @abstractmethod
-    def product(self) -> None:
-        pass
-
-    @abstractmethod
-    def insert_header(self, title) -> None:
+    def insert_header(self, title: str) -> None:
         """Inserts the title into the PDF."""
         pass
 
     @abstractmethod
-    def insert_exercise(self, exercise) -> None:
+    def insert_exercise(self, numerator: int, exercise: str) -> None:
         """Inserts an exercise into the PDF."""
         pass
 
     @abstractmethod
-    def insert_solution(self, solution) -> None:
+    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
         """Inserts a solution into the PDF."""
+        pass
+
+    @abstractmethod
+    def generate(self, filename):
         pass
 
 
@@ -36,51 +43,55 @@ class MathPDFBuilder(PDFBuilder):
     document. It keeps track of the components added to the product
     and provides the resulting product.
     """
+    geometry_settings = {"margin": "0.7in"}
+    # Add document header
+    header = PageStyle("header")
+
     def __init__(self) -> None:
+        self.doc = Document(geometry_options=self.geometry_settings)
         """Initializes the builder with an empty MathPDF product."""
-        self.reset()
+        with self.header.create(Head("L")):
+            self.header.append(LargeText("Date: "))
+            self.header.append(LargeText(datetime.now().strftime("%d.%b.%Y")))
+            self.header.append(LineBreak())
+            self.header.append(LargeText("Hour: "))
+            self.header.append(LargeText(datetime.now().strftime("%H:%M")))
+        # Create right header
+        with self.header.create(Head("R")):
+            with self.header.create(MiniPage(width="\\textwidth", pos='r', align='r')):
+                self.header.append(
+                    StandAloneGraphic(image_options="width=60px", filename="E:/projekty/math-helper/logo.png"))
+        # Create left footer
+        with self.header.create(Foot("L")):
+            self.header.append(const.AUTHOR_NAME)
+            self.header.append(LineBreak())
+            self.header.append(const.PROJECT_NAME)
+        # Create right footer
+        with self.header.create(Foot("R")):
+            self.header.append(const.GITHUB_PROFILE)
+            self.header.append(LineBreak())
+            self.header.append(const.GITHUB_PROJECT_REPOSITORY)
 
-    def reset(self) -> None:
-        """Resets the builder with a fresh MathPDF product instance."""
-        self._product = MathPDF()
-
-    @property
-    def product(self) -> MathPDF:
-        """Finalizes the building process and returns the finished MathPDF product."""
-        product = self._product
-        self.reset()
-        return product
+        self.doc.preamble.append(self.header)
+        self.doc.change_document_style("header")
 
     def insert_header(self, title) -> None:
-        self._product.add(title)
+        with self.doc.create(MiniPage(align='c')):
+            self.doc.append(LargeText(bold(title)))
 
-    def insert_exercise(self, exercise) -> None:
-        self._product.add(exercise)
+    def insert_exercise(self, numerator: int, exercise: str) -> None:
+        with self.doc.create(Section(NoEscape(rf"{numerator}.~~~{exercise} = ?"), numbering=False)):
+            pass
 
-    def insert_solution(self, solution) -> None:
-        self._product.add(solution)
+    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
+        with self.doc.create(Section(NoEscape(rf"{numerator}.~~~{exercise} = {solution}"), numbering=False)):
+            pass
 
-    def insert_footer(self, footer) -> None:
-        self._product.add(footer)
-
-
-class MathPDF:
-    """
-    Represents a MathPDF document. The product class of the Builder design pattern.
-    It provides methods to add parts to the document and retrieve the final content.
-    """
-
-    def __init__(self) -> None:
-        """Initializes an empty list of parts for the PDF document."""
-        self.parts = []
-
-    def add(self, part: Any) -> None:
-        """Adds a new part to the PDF document."""
-        self.parts.append(part)
-
-    def list_parts(self) -> None:
-        """Lists out all parts of the PDF document."""
-        print(f"PDF parts: {', '.join(self.parts)}", end="")
+    def generate(self, filename, filepath: str = const.DEFAULT_PATH) -> None:
+        self.doc.generate_pdf(filepath=f"{filepath}/{filename}",
+                              compiler='pdflatex',
+                              clean_tex=True)
+        self.__init__()
 
 
 class Director:
@@ -101,19 +112,40 @@ class Director:
     def builder(self, builder: PDFBuilder) -> None:
         self._builder = builder
 
-    def build_exercises(self, title, exercises) -> None:
+    def build_exercises(self, title: str, exercises: list, filename: str) -> None:
         """
         Constructs a PDF document with exercises, including
         a title, a series of exercises, and a header.
         """
-        self.builder.insert_header(title)
-        for exercise in exercises:
-            self.builder.insert_exercise(exercise)
+        self.builder.insert_header(title=title)
+        for i, exercise in enumerate(exercises, 1):
+            self.builder.insert_exercise(numerator=i, exercise=exercise)
+        self.builder.generate(filename)
 
-    def build_solutions(self, title, exercises) -> None:
+    def build_solutions(self, title, exercises: dict, filename: str) -> None:
         """
         Constructs a PDF document with solutions, including a title, a series of exercises, and a header.
         """
-        self.builder.insert_header(title)
-        for exercise in exercises:
-            self.builder.insert_exercise(exercise)
+        self.builder.insert_header(title=title)
+        for i, (exercise, solution) in enumerate(exercises.items(), 1):
+            self.builder.insert_solution(numerator=i, exercise=exercise, solution=solution)
+        self.builder.generate(filename)
+
+
+if __name__ == "__main__":
+    director = Director()
+    builder = MathPDFBuilder()
+    director.builder = builder
+    examples = ['0.1 + 0.1', '0.06 + 0.08',
+                '0.1 + 0.03', '0.09 + 0.06',
+                '0.1 + 0.09', '0.08 + 0.07',
+                '0.08 + 0.09', '0.09 + 0.06',
+                '0.07 + 0.1', '0.09 + 0.08']
+    examples_solutions = {'0.1 + 0.1': 0.2, '0.06 + 0.08': 0.14,
+                          '0.1 + 0.03': 0.13, '0.09 + 0.06': 0.15,
+                          '0.1 + 0.09': 0.19, '0.08 + 0.07': 0.15,
+                          '0.08 + 0.09': 0.17, '0.07 + 0.1': 0.17,
+                          '0.09 + 0.08': 0.17}
+
+    director.build_exercises(title="Exercises", exercises=examples, filename="exercises")
+    director.build_solutions(title="Solutions", exercises=examples_solutions, filename="solutions")

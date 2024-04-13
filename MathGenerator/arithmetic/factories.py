@@ -104,6 +104,8 @@ class MultiplicationFactory(ArithmeticFactory):
 
 class DivisionFactory(ArithmeticFactory):
     """Class for managing Division exercises"""
+    result_format = staticmethod(lambda x: round(x, 3))
+
     def __init__(self):
         super().__init__(operator_symbol="/")
 
