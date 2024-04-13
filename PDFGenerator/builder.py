@@ -45,8 +45,8 @@ class MathPDFBuilder(PDFBuilder):
     document. It keeps track of the components added to the product
     and provides the resulting product.
     """
+
     geometry_settings = {"margin": "0.7in"}
-    # Add document header
     header = PageStyle("header")
 
     def __init__(self) -> None:
@@ -83,14 +83,22 @@ class MathPDFBuilder(PDFBuilder):
             self.doc.append(LargeText(bold(title)))
 
     def insert_exercise(self, numerator: int, exercise: str) -> None:
-        with self.doc.create(Section(NoEscape(rf"{numerator}.~~~{exercise} = ?"), numbering=False)):
+        end_line = "" if '=' in exercise else "= ?"
+        with self.doc.create(
+                Section(NoEscape(rf"{numerator}.~~~{exercise} {end_line}"), numbering=False)
+        ):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
-        with self.doc.create(Section(NoEscape(rf"{numerator}.~~~{exercise} = {solution}"), numbering=False)):
+        comparison_operator = '~~--~~' if '=' in exercise else '='
+        with self.doc.create(
+                Section(NoEscape(rf"{numerator}.~~~{exercise} {comparison_operator} {solution}"), numbering=False)
+        ):
             pass
 
-    def generate(self, filename, filepath: str = const.DEFAULT_PATH) -> None:
+    def generate(self, filename,
+                 filepath: str = os.path.join(
+                     os.path.dirname(os.path.dirname(__file__)), 'PDFs').replace('\\', "/")) -> None:
         self.doc.generate_pdf(filepath=f"{filepath}/{filename}",
                               compiler='pdflatex',
                               clean_tex=True)
@@ -139,12 +147,12 @@ if __name__ == "__main__":
     director = Director()
     builder = MathPDFBuilder()
     director.builder = builder
-    examples = ['0.1 + 0.1', '0.06 + 0.08',
+    examples = ['0.1 + 0.1 = x', '0.06 + 0.08',
                 '0.1 + 0.03', '0.09 + 0.06',
                 '0.1 + 0.09', '0.08 + 0.07',
                 '0.08 + 0.09', '0.09 + 0.06',
                 '0.07 + 0.1', '0.09 + 0.08']
-    examples_solutions = {'0.1 + 0.1': 0.2, '0.06 + 0.08': 0.14,
+    examples_solutions = {'0.1 + 0.1 = x': 'x = 0.2', '0.06 + 0.08': 0.14,
                           '0.1 + 0.03': 0.13, '0.09 + 0.06': 0.15,
                           '0.1 + 0.09': 0.19, '0.08 + 0.07': 0.15,
                           '0.08 + 0.09': 0.17, '0.07 + 0.1': 0.17,
