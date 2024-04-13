@@ -60,6 +60,7 @@ class MathPDFBuilder(PDFBuilder):
             self.header.append(LargeText(datetime.now().strftime("%H:%M")))
         # Create right header
         with self.header.create(Head("R")):
+            # Replace backslashes due to LaTeX Syntax
             logo_path = os.path.join(os.path.dirname(__file__), 'logo.png').replace('\\', "/")
             with self.header.create(MiniPage(width="\\textwidth", pos='r', align='r')):
                 self.header.append(
@@ -98,7 +99,9 @@ class MathPDFBuilder(PDFBuilder):
 
     def generate(self, filename,
                  filepath: str = os.path.join(
-                     os.path.dirname(os.path.dirname(__file__)), 'PDFs').replace('\\', "/")) -> None:
+                     # Replace backslashes due to LaTeX Syntax
+                     os.path.dirname(os.path.dirname(__file__)), 'PDFs').replace('\\', "/")
+                 ) -> None:
         self.doc.generate_pdf(filepath=f"{filepath}/{filename}",
                               compiler='pdflatex',
                               clean_tex=True)
@@ -141,6 +144,9 @@ class Director:
         for i, (exercise, solution) in enumerate(exercises.items(), 1):
             self.builder.insert_solution(numerator=i, exercise=exercise, solution=solution)
         self.builder.generate(filename)
+
+    def build_exam(self):
+        pass
 
 
 if __name__ == "__main__":

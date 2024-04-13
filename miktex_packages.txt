@@ -1,0 +1,201 @@
+amsfonts 3.04
+amsmath 2.17o
+arabi 1.1
+atbegshi 1.19
+atveryend 1.11
+avantgar 
+babel 24.3
+babel-english 3.3r
+biber-windows-x64 2.20
+biblatex 3.20
+bibtex 0.99d
+blindtext 2.0
+bookman 
+cbcoptic 0.2
+cm 
+courier 
+csfonts 
+csplain Mar. 2022
+dehyph 
+dvipdfmx 
+dvips 
+ec 1.0
+elhyphen 5
+enctex 
+environ 0.3
+epstopdf-pkg 2.11
+etoolbox 2.5k
+everyshi 4.00
+fancyhdr 4.1
+fontconfig 
+fontspec 2.9a
+geometry 5.9
+ghostscript 
+glyphlist 
+graphics 1.4e
+graphics-cfg 
+graphics-def 
+helvetic 
+hyperref 7.01h
+hyph-utf8 
+iftex 1.0f
+knuth-lib 
+l3backend 
+l3kernel 
+l3packages 
+lastpage 2.0e
+latex-firstaid 1.1c
+latex-fonts 
+latex-tools 2023-11-01c
+latexmk 4.85
+listings 1.10a
+lm 2.005
+ltxbase 2023-11-01 PL1
+lualibs 2.76
+luaotfload 3.28
+luatex85 1.4
+make4ht 0.4
+metafont 2.7182818
+metapost 
+miktex-arctrl-bin-x64-2.9 24.3.31
+miktex-asymptote-bin-x64-2.9 2.88
+miktex-autosp-bin-x64-2.9 2023-10-07
+miktex-axohelp-bin-x64-2.9 1.4
+miktex-bibarts-bin-x64-2.9 2.5
+miktex-bibtex-bin-x64-2.9 0.99d
+miktex-bibtex8bit-bin-x64-2.9 4.02
+miktex-bzip2-bin-x64-2.9 1.0.8
+miktex-cairo-bin-x64-2.9 1.16.0
+miktex-chktex-bin-x64-2.9 1.7.8
+miktex-cjkutils-bin-x64-2.9 4.8.4
+miktex-config-2.9 23.4
+miktex-console-bin-x64-2.9 24.3.31
+miktex-curl-bin-x64-2.9 8.4.0
+miktex-cweb-bin-x64-2.9 4.7
+miktex-devnag-bin-x64-2.9 2.17
+miktex-dict-british 2.8.1
+miktex-dict-english 
+miktex-dict-french 
+miktex-dict-german 
+miktex-doc 24.3.31
+miktex-dvicopy-bin-x64-2.9 1.6
+miktex-dvipdfmx 
+miktex-dvipdfmx-bin-x64-2.9 20240305
+miktex-dvipng-bin-x64-2.9 1.17
+miktex-dvips 
+miktex-dvips-bin-x64-2.9 2023.1
+miktex-dvisvgm-bin-x64-2.9 3.2.2
+miktex-epstopdf-bin-x64-2.9 24.3.31
+miktex-expat-bin-x64-2.9 2.5.0
+miktex-findtexmf-bin-x64-2.9 24.3.31
+miktex-fmt-bin-x64-2.9 10.1.1
+miktex-fontconfig 
+miktex-fontconfig-bin-x64-2.9 2.13.1
+miktex-fonts-bin-x64-2.9 
+miktex-freeglut-bin-x64-2.9 3.4.0
+miktex-freetype2-bin-x64-2.9 2.12.1
+miktex-fribidixetex-bin-x64-2.9 0.20
+miktex-gd-bin-x64-2.9 2.3.3
+miktex-ghostscript-bin-x64 9.25
+miktex-graphite2-bin-x64-2.9 1.3.14
+miktex-gregorio-bin-x64-2.9 6.0.0-beta2
+miktex-gsf2pk-bin-x64-2.9 24.3.31
+miktex-harfbuzz-bin-x64-2.9 8.2.1
+miktex-hitex-bin-x64 2.0
+miktex-hunspell-bin-x64-2.9 1.7.2
+miktex-icu-bin-x64 74.2
+miktex-jpeg-bin-x64-2.9 9e
+miktex-kpathsea-bin-x64-2.9 1.12.14
+miktex-lacheck-bin-x64-2.9 1.30
+miktex-latex 
+miktex-lcdf-typetools-bin-x64-2.9 2.108
+miktex-libressl-bin-x64-2.9 3.8.1
+miktex-log4cxx-bin-x64-2.9 1.1.0
+miktex-lua53-bin-x64-2.9 5.3.6
+miktex-luatex 
+miktex-luatex-bin-x64-2.9 1.18.1
+miktex-lzma-bin-x64-2.9 5.4.0
+miktex-m-tx-bin-x64-2.9 0.63d
+miktex-makeindex-bin-x64-2.9 2.16
+miktex-md5-bin-x64-2.9 
+miktex-metafont 
+miktex-metafont-bin-x64-2.9 2.71828182
+miktex-metapost-bin-x64-2.9 2.10
+miktex-mfware-bin-x64-2.9 
+miktex-misc 
+miktex-mktex-bin-x64-2.9 24.3.31
+miktex-mo-bin-x64-2.9 24.3.31
+miktex-mpmcli-bin-x64-2.9 24.3.31
+miktex-mspack-bin-x64-2.9 0.10.1alpha
+miktex-mthelp-bin-x64-2.9 24.3.31
+miktex-mtprint-bin-x64-2.9 24.3.31
+miktex-omegaware-bin-x64-2.9 1.15
+miktex-patgen-bin-x64 2.4
+miktex-pdftex 
+miktex-pdftex-bin-x64-2.9 1.40.26
+miktex-pixman-bin-x64-2.9 0.42.2
+miktex-pmx-bin-x64-2.9 3.00
+miktex-png-bin-x64-2.9 1.6.39
+miktex-poppler-bin-x64-2.9 23.12.0
+miktex-popt-bin-x64-2.9 1.18
+miktex-posix-bin-x64-2.9 2.3.6
+miktex-ps2pk-bin-x64-2.9 1.8
+miktex-psutils-bin-x64-2.9 1.23
+miktex-ptex-bin-x64 4.1.0
+miktex-qt6-bin-x64 6.5.3
+miktex-runtime-bin-x64-2.9 24.3.31
+miktex-synctex-bin-x64-2.9 1.5
+miktex-tdsutil-bin-x64 24.3.31
+miktex-teckit-bin-x64-2.9 2.5.10
+miktex-tex pd
+miktex-tex-bin-x64-2.9 3.141592653
+miktex-tex2xindy-bin-x64-2.9 1.24
+miktex-tex4ht 
+miktex-tex4ht-bin-x64-2.9 2023-10-13-15:32
+miktex-texify-bin-x64-2.9 
+miktex-texware-bin-x64-2.9 
+miktex-texworks-bin-x64-2.9 0.6.9
+miktex-ttf2pk2-bin-x64-2.9 2.0
+miktex-ucrt-bin-x64 10.0.18362.1
+miktex-upmendex-bin-x64 1.08
+miktex-uriparser-bin-x64-2.9 0.9.7
+miktex-vc140-bin-x64 14.26.28720
+miktex-web-bin-x64-2.9 
+miktex-xetex 
+miktex-xetex-bin-x64-2.9 0.999996
+miktex-xindy-bin-x64 
+miktex-xml2pmx-bin-x64 2021-02-07
+miktex-yap-bin-x64-2.9 24.3.31
+miktex-zip-bin-x64 3.1b
+miktex-zlib-bin-x64-2.9 1.2.13
+miktex-zzip-bin-x64-2.9 0.13.72
+modes 4.3
+mptopdf 
+ms 
+ncntrsbk 
+oberdiek 
+palatino 
+pdftex 
+pdftexcmds 0.33
+pgf 3.1.10
+pgfplots 1.18.1
+plain 3.1415926535
+ragged2e 3.6
+rsfs 
+ruhyphen 1.6
+standalone 1.3b
+symbol 
+tcolorbox 6.2.0
+tetex 3.0
+tex-ini-files 
+tex4ht 
+times 
+trimspaces 1.1
+ukrhyph 
+unicode-data 1.17
+url 3.4
+xcolor 3.01
+xetex 
+xkeyval 2.9
+zapfchan 
+zapfding 
