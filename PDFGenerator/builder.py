@@ -15,7 +15,7 @@ class PDFBuilder(ABC):
         pass
 
     @abstractmethod
-    def insert_title(self, title) -> None:
+    def insert_header(self, title) -> None:
         """Inserts the title into the PDF."""
         pass
 
@@ -27,11 +27,6 @@ class PDFBuilder(ABC):
     @abstractmethod
     def insert_solution(self, solution) -> None:
         """Inserts a solution into the PDF."""
-        pass
-
-    @abstractmethod
-    def insert_header(self, header) -> None:
-        """Inserts a header into the PDF."""
         pass
 
 
@@ -56,7 +51,7 @@ class MathPDFBuilder(PDFBuilder):
         self.reset()
         return product
 
-    def insert_title(self, title) -> None:
+    def insert_header(self, title) -> None:
         self._product.add(title)
 
     def insert_exercise(self, exercise) -> None:
@@ -65,8 +60,8 @@ class MathPDFBuilder(PDFBuilder):
     def insert_solution(self, solution) -> None:
         self._product.add(solution)
 
-    def insert_header(self, header) -> None:
-        self._product.add(header)
+    def insert_footer(self, footer) -> None:
+        self._product.add(footer)
 
 
 class MathPDF:
@@ -106,21 +101,19 @@ class Director:
     def builder(self, builder: PDFBuilder) -> None:
         self._builder = builder
 
-    def build_exercises(self, title, exercises, header) -> None:
+    def build_exercises(self, title, exercises) -> None:
         """
         Constructs a PDF document with exercises, including
         a title, a series of exercises, and a header.
         """
-        self.builder.insert_title(title)
+        self.builder.insert_header(title)
         for exercise in exercises:
             self.builder.insert_exercise(exercise)
-        self.builder.insert_header(header)
 
-    def build_solutions(self, title, exercises, header) -> None:
+    def build_solutions(self, title, exercises) -> None:
         """
         Constructs a PDF document with solutions, including a title, a series of exercises, and a header.
         """
-        self.builder.insert_title(title)
+        self.builder.insert_header(title)
         for exercise in exercises:
             self.builder.insert_exercise(exercise)
-        self.builder.insert_header(header)
