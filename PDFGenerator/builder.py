@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
+import os
 
 from pylatex import (Document, NoEscape,
                      StandAloneGraphic, LineBreak,
@@ -59,9 +60,10 @@ class MathPDFBuilder(PDFBuilder):
             self.header.append(LargeText(datetime.now().strftime("%H:%M")))
         # Create right header
         with self.header.create(Head("R")):
+            logo_path = os.path.join(os.path.dirname(__file__), 'logo.png').replace('\\', "/")
             with self.header.create(MiniPage(width="\\textwidth", pos='r', align='r')):
                 self.header.append(
-                    StandAloneGraphic(image_options="width=60px", filename="E:/projekty/math-helper/logo.png"))
+                    StandAloneGraphic(image_options="width=60px", filename=logo_path))
         # Create left footer
         with self.header.create(Foot("L")):
             self.header.append(const.AUTHOR_NAME)
