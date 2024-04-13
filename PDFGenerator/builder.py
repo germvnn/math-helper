@@ -34,6 +34,7 @@ class PDFBuilder(ABC):
 
     @abstractmethod
     def generate(self, filename):
+        """Generate PDF file"""
         pass
 
 
@@ -48,8 +49,8 @@ class MathPDFBuilder(PDFBuilder):
     header = PageStyle("header")
 
     def __init__(self) -> None:
+        """Initializes the PDF file with template."""
         self.doc = Document(geometry_options=self.geometry_settings)
-        """Initializes the builder with an empty MathPDF product."""
         with self.header.create(Head("L")):
             self.header.append(LargeText("Date: "))
             self.header.append(LargeText(datetime.now().strftime("%d.%b.%Y")))
