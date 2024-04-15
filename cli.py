@@ -25,7 +25,9 @@ class Factory:
             'faddition': arithmetic.FractionAdditionFactory,
             'fsubtraction': arithmetic.FractionSubtractionFactory,
             'fmultiplication': arithmetic.FractionMultiplicationFactory,
-            'fdivision': arithmetic.FractionDivisionFactory
+            'fdivision': arithmetic.FractionDivisionFactory,
+            'paddition': arithmetic.PercentAdditionFactory,
+            'psubtraction': arithmetic.PercentSubtractionFactory
         }
         return factories[operation]()
 
@@ -48,7 +50,9 @@ def main():
         'faddition',
         'fsubtraction',
         'fmultiplication',
-        'fdivision'],
+        'fdivision',
+        'paddition',
+        'psubtraction'],
                         required=True, help='Type of operation')
     parser.add_argument('-level', type=int, required=True, help='Difficulty level of the exercises')
     parser.add_argument('-amount', type=int, required=True, help='Amount of exercises to generate')

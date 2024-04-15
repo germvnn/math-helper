@@ -10,6 +10,7 @@ from pylatex import (Document, NoEscape,
 from pylatex.utils import bold
 
 from PDFGenerator import constants as const
+from PDFGenerator import utils
 
 
 class PDFBuilder(ABC):
@@ -86,15 +87,18 @@ class MathPDFBuilder(PDFBuilder):
     def insert_exercise(self, numerator: int, exercise: str) -> None:
         end_line = "" if '=' in exercise else "= ?"
         with self.doc.create(
-                Section(NoEscape(rf"{numerator}.~~~{exercise} {end_line}"), numbering=False)
+                Section(utils.exercise_string(numerator=numerator,
+                                              exercise=exercise,
+                                              end_line=end_line), numbering=False)
         ):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
         comparison_operator = '~~--~~' if '=' in exercise else '='
-        with self.doc.create(
-                Section(NoEscape(rf"{numerator}.~~~{exercise} {comparison_operator} {solution}"), numbering=False)
-        ):
+        with self.doc.create(Section(utils.solution_string(numerator=numerator,
+                                                           exercise=exercise,
+                                                           comparison_operator=comparison_operator,
+                                                           solution=solution), numbering=False)):
             pass
 
     def generate(self, filename,
