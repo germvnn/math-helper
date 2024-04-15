@@ -1,4 +1,3 @@
-# TODO: Implement operations for %
 import operator
 import random
 
@@ -39,9 +38,11 @@ class ArithmeticFactory(ExerciseFactory):
             - exercises (list): A list of string expressions representing the arithmetic
                                 problems to solve.
     """
-
-    number_type = int
+    # Describes types of numbers in exercises
+    number_type: type = int
+    # Format results of solve method
     result_format = staticmethod(lambda x: x)
+
     number_generator = random.randint
 
     def __init__(self, operator_symbol):
@@ -55,19 +56,26 @@ class ArithmeticFactory(ExerciseFactory):
         }[operator_symbol]
 
     def generate(self, level: int, amount: int) -> list:
+        # Initialize an empty list of exercises
         exercises = []
         max_number = 10 ** level
 
+        # Process of generating a single exercise
         for _ in range(amount):
             components_count = 3 if level > 4 else 2
-            components = [str(self.number_generator(random.randint(2, 9), max_number)) for _ in range(components_count)]
-            question = self.operator_symbol.join(components)
-            exercises.append(question)
+            components = [str(
+                self.number_generator(random.randint(2, 9), max_number)
+            ) for _ in range(components_count)]
+            exercise = self.operator_symbol.join(components)
+            exercises.append(exercise)
 
         return exercises
 
     def solve(self, exercises: list) -> dict:
+        # Initialize an empty dict of solutions {'exercise': solution}
         solutions = {}
+
+        # Process of solving a single exercise
         for exercise in exercises:
             components = [self.number_type(component) for component in exercise.split(self.operator_symbol)]
 
@@ -104,6 +112,8 @@ class MultiplicationFactory(ArithmeticFactory):
 
 class DivisionFactory(ArithmeticFactory):
     """Class for managing Division exercises"""
+    # TODO: Consider implementing modulo in solutions
+    # Rounding results to three decimal places
     result_format = staticmethod(lambda x: round(x, 3))
 
     def __init__(self):
@@ -114,6 +124,7 @@ class DivisionFactory(ArithmeticFactory):
         exercises = []
         max_number = 10 ** level
 
+        # Process of generating a single division exercise
         for _ in range(amount):
             dividend = self.number_generator(1, max_number)
             divisor = self.number_generator(1, 9) if level < 4 else self.number_generator(11, 99)
@@ -151,8 +162,63 @@ class FractionDivisionFactory(FractionFactory, DivisionFactory):
     number_generator = staticmethod(lambda a, b: random.randint(a, b) / 10)
 
 
+class PercentFactory(ArithmeticFactory):
+    number_type = float
+    number_generator = staticmethod(lambda a, precision: round(random.uniform(a, 100), precision))
+    result_format = staticmethod(lambda x, dp: round(x, dp))
+
+    def generate(self, level: int, amount: int) -> list:
+        exercises = []
+        max_number = 100  # Percentages
+
+        # Process of generating single exercise
+        for _ in range(amount):
+            components_count = 3 if level > 4 else 2
+            components = [
+                f"{self.number_generator(a=random.randint(2, 9), precision=level - 1)}%"
+                for _ in range(components_count)
+            ]
+            exercise = self.operator_symbol.join(components)
+            exercises.append(exercise)
+        return exercises
+
+    def solve(self, exercises: list) -> dict:
+        solutions = {}
+
+        # Process of solving a single exercise
+        for exercise in exercises:
+            # Remove the '%' sign
+            components = [component.replace('%', '') for component in
+                          exercise.split(self.operator_symbol)]
+            # Check max number of decimal places for components
+            dp = max((component[::-1].find('.') for component in components if '.' in component), default=0)
+            # Convert components to numeric type
+            components = [self.number_type(component) for component in components]
+            result = components[0]
+            for component in components[1:]:
+                result = self.operator_function(result, component)
+            # Format the result to add the '%' sign and store it in the solutions dictionary
+            solutions[exercise] = f"{self.result_format(result, dp)}%"
+
+        return solutions
+
+
+class PercentAdditionFactory(PercentFactory, AdditionFactory):
+    pass
+
+
+class PercentSubtractionFactory(PercentFactory, SubtractionFactory):
+    pass
+
+
+class PercentMultiplicationFactory(PercentFactory, MultiplicationFactory):
+    # TODO: Adjust generate method by new 'level mechanism' due to difficulty
+    # TODO: Implement solve method adjusted to percentages.
+    pass
+
+
 if __name__ == "__main__":
-    generator = FractionAdditionFactory()
+    generator = PercentSubtractionFactory()
     examples = generator.generate(level=1, amount=10)
     results = generator.solve(exercises=examples)
 
