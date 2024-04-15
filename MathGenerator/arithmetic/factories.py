@@ -164,18 +164,19 @@ class FractionDivisionFactory(FractionFactory, DivisionFactory):
 
 class PercentFactory(ArithmeticFactory):
     number_type = float
-    number_generator = staticmethod(lambda a, precision: round(random.uniform(a, 100), precision))
+    # Set range of generating percentages to 1-100. Level of exercises will increase precision
+    number_generator = staticmethod(lambda precision: round(random.uniform(1, 100), precision))
+    # Parametrize rounding due to different decimals
     result_format = staticmethod(lambda x, dp: round(x, dp))
 
     def generate(self, level: int, amount: int) -> list:
         exercises = []
-        max_number = 100  # Percentages
 
         # Process of generating single exercise
         for _ in range(amount):
             components_count = 3 if level > 4 else 2
             components = [
-                f"{self.number_generator(a=random.randint(2, 9), precision=level - 1)}%"
+                f"{self.number_generator(precision=level - 1)}%"
                 for _ in range(components_count)
             ]
             exercise = self.operator_symbol.join(components)
