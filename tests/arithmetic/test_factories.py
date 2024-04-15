@@ -51,7 +51,7 @@ def test_arithmetic_generate(factory, level, expected_component_amount):
     (f.FractionDivisionFactory(), 4, 2, True),
     (f.FractionDivisionFactory(), 5, 2, True),
 ])
-def test_fraction_arithmetic_generate(factory, level, expected_component_amount, scaling):
+def test_arithmetic_fraction_generate(factory, level, expected_component_amount, scaling):
     amount = random.randint(1, 10)
     exercises = factory.generate(level=level, amount=amount)
     divisor = 10 if scaling else 100
@@ -73,6 +73,35 @@ def test_fraction_arithmetic_generate(factory, level, expected_component_amount,
                 f"Component {component} > {max_number}"
 
 
+@pytest.mark.parametrize("factory, level, expected_component_amount", [
+    (f.PercentAdditionFactory(), 5, 3),
+    (f.PercentAdditionFactory(), 3, 2),
+    (f.PercentSubtractionFactory(), 3, 2),
+    (f.PercentSubtractionFactory(), 6, 3),
+    (f.PercentMultiplicationFactory(), 5, 3),
+    (f.PercentMultiplicationFactory(), 3, 2)
+])
+def test_arithmetic_percent_generate(factory, level, expected_component_amount):
+    amount = random.randint(1, 10)
+    exercises = factory.generate(level=level, amount=amount)
+    max_number = 100
+
+    assert len(exercises) == amount,\
+        f"Number of exercises {len(exercises)}, Expected: {amount}"
+
+    for exercise in exercises:
+        assert factory.operator_symbol.strip() in exercise, \
+            f"There are no expected operator: {factory.operator_symbol.strip()}"
+        components = exercise.split(factory.operator_symbol)
+        assert len(components) == expected_component_amount, \
+            f"Number of components: {len(components)}, Expected: {expected_component_amount}"
+        for component in components:
+            # Validate that percentage is in component
+            assert '%' in component, f"There are no % in {component}"
+            assert float(component.strip('%')) < max_number, \
+                f"Component {component} > {max_number}"
+
+
 @pytest.mark.parametrize("factory, exercises_results", [
     (f.AdditionFactory(),
      {'7712 + 2211 + 2458': 12381, '9209 + 5627 + 16': 14852}),
@@ -90,6 +119,30 @@ def test_fraction_arithmetic_generate(factory, level, expected_component_amount,
      {'6.7 * 49.4': 330.98, '69.6 * 34.2': 2380.32, '10.3 * 99.7': 1026.91}),
     (f.FractionDivisionFactory(),
      {'182.4 / 4.3': 42.419, '663.9 / 7.4': 89.716, '275.8 / 8.8': 31.341}),
+    (f.PercentAdditionFactory(),
+     {
+         '87.8% + 45.0%': '132.8%',
+         '68.87% + 44.0618%': '112.9318%',
+         '44.0% + 39.72%': '83.72%',
+         '53.9% + 19.4%': '73.3%',
+         '34.065% + 75.03%': '109.095%'
+     }),
+    (f.PercentSubtractionFactory(),
+     {
+         '38.3171% - 82.317%': '-43.9999%',
+         '91.0% - 85.748%': '5.252%',
+         '58.5% - 83.5068%': '-25.0068%',
+         '84.04% - 27.6%': '56.44%',
+         '46.1582% - 83.2097%': '-37.0515%'
+     }),
+    (f.PercentMultiplicationFactory(),
+     {
+         '50% * 50%': '25.0%',
+         '100% * 75%': '75.0%',
+         '25% * 50%': '12.5%',
+         '5.66% * 39.9%': '2.2583%',
+         '53.45% * 34.05%': '18.1997%'
+     })
 ])
 def test_arithmetic_solve(factory, exercises_results):
     for exercise, expected_result in exercises_results.items():
