@@ -16,5 +16,5 @@ class ExerciseFactory(ABC):
         pass
 
     @abstractmethod
-    def solve(self, exercise):
+    def solve(self, exercises: list):
         pass
