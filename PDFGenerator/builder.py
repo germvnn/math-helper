@@ -3,10 +3,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 import os
 
-from pylatex import (Document, NoEscape,
-                     StandAloneGraphic, LineBreak,
-                     Section, PageStyle,
-                     Head, MiniPage, Foot, LargeText)
+from pylatex import (Document,StandAloneGraphic, LineBreak,
+                     Section, PageStyle,Head, MiniPage,
+                     Foot, LargeText)
 from pylatex.utils import bold
 
 from PDFGenerator import constants as const
@@ -19,38 +18,13 @@ class PDFBuilder(ABC):
     interface for constructing PDF documents.
     """
 
-    @abstractmethod
-    def insert_header(self, title: str) -> None:
-        """Inserts the title into the PDF."""
-        pass
-
-    @abstractmethod
-    def insert_exercise(self, numerator: int, exercise: str) -> None:
-        """Inserts an exercise into the PDF."""
-        pass
-
-    @abstractmethod
-    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
-        """Inserts a solution into the PDF."""
-        pass
-
-    @abstractmethod
-    def generate(self, filename):
-        """Generate PDF file"""
-        pass
-
-
-class MathPDFBuilder(PDFBuilder):
-    """
-    Builder implementation that constructs parts of a MathPDF
-    document. It keeps track of the components added to the product
-    and provides the resulting product.
-    """
-
     geometry_settings = {"margin": "0.7in"}
     header = PageStyle("header")
 
-    def __init__(self) -> None:
+    def __init__(self):
+        self._setup_document()
+
+    def _setup_document(self):
         """Initializes the PDF file with template."""
         self.doc = Document(geometry_options=self.geometry_settings)
         with self.header.create(Head("L")):
@@ -80,6 +54,39 @@ class MathPDFBuilder(PDFBuilder):
         self.doc.preamble.append(self.header)
         self.doc.change_document_style("header")
 
+    @abstractmethod
+    def insert_header(self, title: str) -> None:
+        """Inserts the title into the PDF."""
+        pass
+
+    @abstractmethod
+    def insert_exercise(self, numerator: int, exercise: str) -> None:
+        """Inserts an exercise into the PDF."""
+        pass
+
+    @abstractmethod
+    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
+        """Inserts a solution into the PDF."""
+        pass
+
+    def generate(self, filename,
+                 filepath: str = os.path.join(
+                     # Replace backslashes due to LaTeX Syntax
+                     os.path.dirname(os.path.dirname(__file__)), 'PDFs').replace('\\', "/")
+                 ) -> None:
+        self.doc.generate_pdf(filepath=f"{filepath}/{filename}",
+                              compiler='pdflatex',
+                              clean_tex=True)
+        self._setup_document()
+
+
+class MathPDFBuilder(PDFBuilder):
+    """
+    Builder implementation that constructs parts of a MathPDF
+    document. It keeps track of the components added to the product
+    and provides the resulting product.
+    """
+
     def insert_header(self, title) -> None:
         with self.doc.create(MiniPage(align='c')):
             self.doc.append(LargeText(bold(title)))
@@ -100,16 +107,6 @@ class MathPDFBuilder(PDFBuilder):
                                                            comparison_operator=comparison_operator,
                                                            solution=solution), numbering=False)):
             pass
-
-    def generate(self, filename,
-                 filepath: str = os.path.join(
-                     # Replace backslashes due to LaTeX Syntax
-                     os.path.dirname(os.path.dirname(__file__)), 'PDFs').replace('\\', "/")
-                 ) -> None:
-        self.doc.generate_pdf(filepath=f"{filepath}/{filename}",
-                              compiler='pdflatex',
-                              clean_tex=True)
-        self.__init__()
 
 
 class Director:
