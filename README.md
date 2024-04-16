@@ -24,7 +24,8 @@ You'll need to specify the operation, level, and amount using command-line argum
 python cli.py -operation [OPERATION] -level [LEVEL] -amount [AMOUNT]
 ```
 
-Replace [OPERATION] with one of the following: addition, subtraction, multiplication, division, faddition (fraction addition), fsubtraction, fmultiplication, or fdivision.
+Replace [OPERATION] with one of the following: addition, subtraction, multiplication, division,
+faddition (fraction addition), fsubtraction, fmultiplication, fdivision, paddition (percent addition), psubtraction
 
 Replace [LEVEL] with the difficulty level of the exercises (as an integer).
 
@@ -35,10 +36,12 @@ Replace [AMOUNT] with the number of exercises to generate (as an integer).
 To generate 5 addition exercises at level 1, use the following command:
 
 ```bash
-python cli.py -operation addition -level 1 -amount 5
+python cli.py -operation paddition -level 2 -amount 15
 ```
 
-The CLI will output the generated exercises and their solutions.
+The CLI will output two .pdf files with exercises and their solutions.
+
+![alt text](https://i.imgur.com/zFB7dXv.png)
 
 ## Contirbuting
 Feel free to fork the repository, make your changes, and submit a pull request if you have a new feature or bug fix.
