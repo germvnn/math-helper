@@ -21,7 +21,7 @@ def test_quadratic_generate(factory_class, level):
         assert factory.operator_symbol in exercise, f"Operator {factory.operator_symbol} not found in {exercise}"
 
         # Assuming the quadratic exercise is structured like 'ax^2 + bx + c operator 0'
-        components = exercise.split(factory.operator_symbol)
+        components = exercise.split(f" {factory.operator_symbol} ")
 
         assert components[1] is '0'
         left_side = components[0]  # Only one side as the other is assumed to be '0'
@@ -36,17 +36,30 @@ def test_quadratic_generate(factory_class, level):
         assert len(all_x) - len(x_squared) == 1, "Should be exactly one 'x'"
 
 
-@pytest.mark.parametrize("factory_class, test_input, expected_output", [
-    (q.QuadraticEquationFactory, "x^2 - 5x + 6 = 0",
-     {"exercise": "x^2 - 5x + 6 = 0", "x1": 2, "x2": 3, "parabola_up": True}),
-    (q.QuadraticInequalityLessFactory, "x^2 - x - 2 < 0",
-     {"exercise": "x^2 - x - 2 < 0", "solution_range": "(-1, 2)", "parabola_up": True}),
-    (q.QuadraticInequalityGreaterFactory, "x^2 - 3x + 2 > 0",
-     {"exercise": "x^2 - 3x + 2 > 0", "solution_range": "(-∞, 1) U (2, ∞)", "parabola_up": True}),
+equations_list = [
+    'x^2 - 2x + 1 = 0',
+    'x^2 - 4x + 4 = 0',
+    'x^2 + 4x + 5 = 0',
+    '-2x^2 + 10x + -8 = 0',
+    'x^2 + x - 6 = 0'
+]
+
+
+@pytest.mark.parametrize("factory, exercises, expected", [
+    (q.QuadraticEquationFactory, ['x^2 - 2x + 1 = 0'],
+     {'x^2 - 2x + 1 = 0': {"roots": (1,), "parabola_direction": "up", "delta": 0}}),
+    (q.QuadraticEquationFactory, ['x^2 + 4x + 5 = 0', '-2x^2 + 10x + -8 = 0'],
+     {
+         'x^2 + 4x + 5 = 0': {"roots": "No real roots, complex roots present", "parabola_direction": "up", "delta": -4},
+         '-2x^2 + 10x + -8 = 0': {"roots": (1, 4), "parabola_direction": "down", "delta": 36}
+      }),
+    (q.QuadraticInequalityLessFactory, ['x^2 + x - 6 < 0'],
+     {'x^2 + x - 6 < 0': {"roots": (2, -3), "parabola_direction": "up", "delta": 25}}),
+    (q.QuadraticInequalityGreaterFactory, ['-x^2 + 4x - 3 > 0'],
+     {'-x^2 + 4x - 3 > 0': {"roots": (1, 3), "parabola_direction": "down", "delta": 4}})
 ])
-def test_quadratic_solve(factory_class, test_input, expected_output):
-    factory = factory_class()
-    solution = factory.solve(test_input)
-
-    assert solution == expected_output, f"Expected {expected_output}, but got {solution}"
-
+def test_quadratic_solve(factory, exercises, expected):
+    factory = factory()
+    results = factory.solve(exercises)
+    for equation in exercises:
+        assert results[equation] == expected[equation], f"Failed for equation: {equation}"
