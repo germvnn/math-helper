@@ -9,6 +9,8 @@ from MathGenerator.algebra import quadratic as q
     (q.QuadraticEquationFactory, 2),
     (q.QuadraticInequalityLessFactory, 2),
     (q.QuadraticInequalityGreaterFactory, 2),
+    (q.QuadraticEqualLessFactory, 2),
+    (q.QuadraticEqualGreaterFactory, 2)
 ])
 def test_quadratic_generate(factory_class, level):
     factory = factory_class()
@@ -56,7 +58,11 @@ equations_list = [
     (q.QuadraticInequalityLessFactory, ['x^2 + x - 6 < 0'],
      {'x^2 + x - 6 < 0': {"roots": (2, -3), "parabola_direction": "up", "delta": 25}}),
     (q.QuadraticInequalityGreaterFactory, ['-x^2 + 4x - 3 > 0'],
-     {'-x^2 + 4x - 3 > 0': {"roots": (1, 3), "parabola_direction": "down", "delta": 4}})
+     {'-x^2 + 4x - 3 > 0': {"roots": (1, 3), "parabola_direction": "down", "delta": 4}}),
+    (q.QuadraticEqualLessFactory, ['x^2 + x - 6 <= 0'],
+     {'x^2 + x - 6 <= 0': {"roots": (2, -3), "parabola_direction": "up", "delta": 25}}),
+    (q.QuadraticEqualGreaterFactory, ['-x^2 + 4x - 3 >= 0'],
+     {'-x^2 + 4x - 3 >= 0': {"roots": (1, 3), "parabola_direction": "down", "delta": 4}})
 ])
 def test_quadratic_solve(factory, exercises, expected):
     factory = factory()
