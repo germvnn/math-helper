@@ -201,7 +201,10 @@ if __name__ == "__main__":
         '2x^2 + 5x + 2 >= 0',
         'x^2 + 2x + -3 < 0',
         '-2x^2 + 3x + 0 <= 0',
-        '-x^2 + -5x + -4 = 0'
+        '-x^2 + -5x + -4 = 0',
+        'x^2 - 2x + 1 = 0',
+        'x^2 - 2x + 1 > 0',
+        'x^2 + x + 1 > 0'
     ]
 
     examples_solutions = {
@@ -209,7 +212,10 @@ if __name__ == "__main__":
         '2x^2 + 5x + 2 >= 0': {'roots': (-0.5, -2.0), 'parabola_direction': 'up', 'delta': 9},
         'x^2 + 2x + -3 < 0': {'roots': (1.0, -3.0), 'parabola_direction': 'up', 'delta': 16},
         '-2x^2 + 3x + 0 <= 0': {'roots': (0.0, 1.5), 'parabola_direction': 'down', 'delta': 9},
-        '-x^2 + -5x + -4 = 0': {'roots': (-4.0, -1.0), 'parabola_direction': 'down', 'delta': 9}
+        '-x^2 + -5x + -4 = 0': {'roots': (-4.0, -1.0), 'parabola_direction': 'down', 'delta': 9},
+        'x^2 - 2x + 1 = 0': {'roots': (1.0,), 'parabola_direction': 'up', 'delta': 0},
+        'x^2 - 2x + 1 > 0': {'roots': (1.0,), 'parabola_direction': 'up', 'delta': 0},
+        'x^2 + x + 1 > 0': {'roots': "No real roots, complex roots present", 'parabola_direction': 'up', 'delta': -3}
     }
 
     director.build_exercises(title="Exercises", exercises=examples, filename="exercises")

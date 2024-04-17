@@ -34,7 +34,7 @@ def quadratic_solution_string(roots, delta):
         else:
             solution_text = "WRONG FORMAT"
     else:
-        solution_text = "No real roots, complex roots present, " + rf"~~~~ \Delta = {delta}"
+        solution_text = "No~real~roots,~complex~roots~present,~" + rf"~~~~ \Delta = {delta}"
     return NoEscape(r'\begin{center}\Large $' + solution_text + r'$ \end{center}')
 
 
@@ -60,8 +60,15 @@ def plot_quadratic(numerator: int, exercise: str, solution: dict):
         return a * x ** 2 + b * x + c
 
     # Determine the x range for plotting
-    x_range = max(roots) - min(roots)
-    x = np.linspace(min(roots) - 0.5 * x_range, max(roots) + 0.5 * x_range, 400)
+    if isinstance(solution['roots'], tuple):
+        # If roots exist, use them to determine the x range for plotting
+        x_range = max(solution['roots']) - min(solution['roots'])
+        x_range = x_range if x_range != 0 else 2
+        x = np.linspace(min(solution['roots']) - 0.5 * x_range, max(solution['roots']) + 0.5 * x_range, 400)
+    else:
+        # If no real roots, use a default range centered at the vertex
+        vertex_x = -b / (2 * a)
+        x = np.linspace(vertex_x - 2, vertex_x + 2, 400)
     y = f(x)
 
     # Generate the plot
@@ -74,26 +81,28 @@ def plot_quadratic(numerator: int, exercise: str, solution: dict):
     plt.grid(False)
 
     # Fill settings
-    fill_kwargs = {'color': 'gray', 'alpha': 0.7, 'hatch': '//'}
+    fill = (y > 0) if '>' in exercise else ((y < 0) if '<' in exercise else None)
+    fill_kwargs = {'where': fill, 'color': 'gray', 'alpha': 0.7, 'hatch': '//'}
 
     # Scatter settings
-    scatter_kwargs = {'zorder': 5, 's': 35, 'edgecolors': 'red', 'linewidths': 1.5}
+    color = 'red' if '=' in exercise else None  # = indicates that scatter must be filled
+    scatter_kwargs = {'facecolors': color, 'zorder': 5, 's': 35, 'edgecolors': 'red', 'linewidths': 1.5}
 
-    # Check for inequality and apply the appropriate fill and scatter properties
-    if '=' in exercise and '<' not in exercise and '>' not in exercise:
-        plt.scatter(roots, [0, 0], facecolors='red', **scatter_kwargs)
-    elif '<=' in exercise:
-        plt.fill_between(x, y, 0, where=(y <= 0), **fill_kwargs)
-        plt.scatter(roots, [0, 0], facecolors='red', **scatter_kwargs)
-    elif '>=' in exercise:
-        plt.fill_between(x, y, 0, where=(y >= 0), **fill_kwargs)
-        plt.scatter(roots, [0, 0], facecolors='red', **scatter_kwargs)
-    elif '<' in exercise:
-        plt.fill_between(x, y, 0, where=(y < 0), **fill_kwargs)
-        plt.scatter(roots, [0, 0], facecolors='none', **scatter_kwargs)
-    else:  # For '>'
-        plt.fill_between(x, y, 0, where=(y > 0), **fill_kwargs)
-        plt.scatter(roots, [0, 0], facecolors='none', **scatter_kwargs)
+    # Check for delta and apply the appropriate fill and scatter properties
+    if solution['delta'] > 0:
+        # When delta is positive, plot the roots
+        plt.scatter(solution['roots'], [0, 0], **scatter_kwargs)
+        if fill is not None:
+            plt.fill_between(x, y, 0, **fill_kwargs)
+    elif solution['delta'] == 0:
+        # When delta is zero, plot the single root
+        plt.scatter(solution['roots'], [0], **scatter_kwargs)
+        if fill is not None:
+            plt.fill_between(x, y, 0, **fill_kwargs)
+    else:
+        # When delta is negative, no real roots to plot, but the parabola still needs to be shown
+        if fill is not None:
+            plt.fill_between(x, y, 0, **fill_kwargs)
 
     plt.legend()
     plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
