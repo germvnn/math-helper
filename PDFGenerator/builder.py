@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 import os
 
-from pylatex import (Document,StandAloneGraphic, LineBreak,
-                     Section, PageStyle,Head, MiniPage,
+from pylatex import (Document, StandAloneGraphic, LineBreak,
+                     Section, PageStyle, Head, MiniPage,
                      Foot, LargeText, Figure, NoEscape)
 from pylatex.utils import bold
 
@@ -128,8 +128,7 @@ class QuadraticPDFBuilder(PDFBuilder):
                                               exercise=exercise,
                                               end_line=""), numbering=False)
         ):
-            self.doc.append(utils.quadratic_solution_string(x1=solution['roots'][0],
-                                                            x2=solution['roots'][1],
+            self.doc.append(utils.quadratic_solution_string(roots=solution['roots'],
                                                             delta=solution['delta']))
             img_path = os.path.join(os.path.dirname(__file__), f'plot{numerator}.png')
             utils.plot_quadratic(numerator=numerator,

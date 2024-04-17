@@ -59,11 +59,11 @@ class QuadraticFactory(ExerciseFactory):
 
             # Calculate roots based on delta
             if delta > 0:
-                x1 = (-b + delta ** 0.5) / (2 * a)
-                x2 = (-b - delta ** 0.5) / (2 * a)
+                x1 = round((-b + delta ** 0.5) / (2 * a), 4)
+                x2 = round((-b - delta ** 0.5) / (2 * a), 4)
                 roots = (x1, x2)
             elif delta == 0:
-                x1 = -b / (2 * a)
+                x1 = round(-b / (2 * a), 4)
                 roots = (x1,)
             else:
                 roots = "No real roots, complex roots present"

@@ -25,8 +25,16 @@ def solution_string(numerator, exercise, comparison_operator, solution):
     return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {comparison_operator} {latexify(solution)}")
 
 
-def quadratic_solution_string(x1, x2, delta):
-    solution_text = rf"x_1 = {x1}, ~~~~ x_2 = {x2}, ~~~~ \Delta = {delta}"
+def quadratic_solution_string(roots, delta):
+    if isinstance(roots, tuple):
+        if len(roots) == 1:
+            solution_text = rf"x_1 = x_2 = {roots[0]}, ~~~~ \Delta = {delta}"
+        elif len(roots) == 2:
+            solution_text = rf"x_1 = {roots[0]}, ~~~~ x_2 = {roots[1]}, ~~~~ \Delta = {delta}"
+        else:
+            solution_text = "WRONG FORMAT"
+    else:
+        solution_text = "No real roots, complex roots present, " + rf"~~~~ \Delta = {delta}"
     return NoEscape(r'\begin{center}\Large $' + solution_text + r'$ \end{center}')
 
 
@@ -89,20 +97,6 @@ def plot_quadratic(numerator: int, exercise: str, solution: dict):
 
     plt.legend()
     plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
-
-
-if __name__ == "__main__":
-    details = {
-        'x^2 - 8x + 7 = 0': {'roots': (7.0, 1.0), 'parabola_direction': 'up', 'delta': 36},
-        'x^2 - 6x + 5 < 0': {'roots': (5.0, 1.0), 'parabola_direction': 'up', 'delta': 16},
-        'x^2 - 6x + 5 <= 0': {'roots': (5.0, 1.0), 'parabola_direction': 'up', 'delta': 16},
-        '2x^2 - 5x + 2 > 0': {'roots': (2.0, 0.5), 'parabola_direction': 'up', 'delta': 9},
-        '-x^2 - 2x + 0 > 0': {'roots': (0.0, -2.0), 'parabola_direction': 'down', 'delta': 4},
-        '-x^2 - 2x + 0 >= 0': {'roots': (0.0, -2.0), 'parabola_direction': 'down', 'delta': 4}
-    }
-
-    for equation, info in details.items():
-        plot_quadratic(equation, info)
 
 
 def remove_plots():
