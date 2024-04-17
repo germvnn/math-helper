@@ -29,6 +29,10 @@ class QuadraticFactory(ExerciseFactory):
                 else:
                     delta = random.choice([d ** 2 for d in range(level, level + 3)])
 
+                # Make 25% chance for delta < 0
+                if random.choice([False, False, True, False]):
+                    delta *= -1
+
                 c = (b ** 2 - delta) / (4 * a)
                 # TODO: Temporary solution. Fractions have to be implemented
                 if c.is_integer():

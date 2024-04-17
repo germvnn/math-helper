@@ -38,23 +38,12 @@ def test_quadratic_generate(factory_class, level):
         assert len(all_x) - len(x_squared) == 1, "Should be exactly one 'x'"
 
 
-equations_list = [
-    'x^2 - 2x + 1 = 0',
-    'x^2 - 4x + 4 = 0',
-    'x^2 + 4x + 5 = 0',
-    '-2x^2 + 10x + -8 = 0',
-    'x^2 + x - 6 = 0'
-]
-
-
 @pytest.mark.parametrize("factory, exercises, expected", [
     (q.QuadraticEquationFactory, ['x^2 - 2x + 1 = 0'],
      {'x^2 - 2x + 1 = 0': {"roots": (1,), "parabola_direction": "up", "delta": 0}}),
     (q.QuadraticEquationFactory, ['x^2 + 4x + 5 = 0', '-2x^2 + 10x + -8 = 0'],
-     {
-         'x^2 + 4x + 5 = 0': {"roots": "No real roots, complex roots present", "parabola_direction": "up", "delta": -4},
-         '-2x^2 + 10x + -8 = 0': {"roots": (1, 4), "parabola_direction": "down", "delta": 36}
-      }),
+     {'x^2 + 4x + 5 = 0': {"roots": "No real roots, complex roots present", "parabola_direction": "up", "delta": -4},
+      '-2x^2 + 10x + -8 = 0': {"roots": (1, 4), "parabola_direction": "down", "delta": 36}}),
     (q.QuadraticInequalityLessFactory, ['x^2 + x - 6 < 0'],
      {'x^2 + x - 6 < 0': {"roots": (2, -3), "parabola_direction": "up", "delta": 25}}),
     (q.QuadraticInequalityGreaterFactory, ['-x^2 + 4x - 3 > 0'],
