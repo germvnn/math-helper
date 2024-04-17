@@ -16,6 +16,8 @@ def latexify(text):
 
 
 def exercise_string(numerator, exercise, end_line):
+    exercise = exercise.replace('<=', r'\leq')
+    exercise = exercise.replace('>=', r'\geq')
     return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {end_line}")
 
 
