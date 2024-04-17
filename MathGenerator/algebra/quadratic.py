@@ -96,10 +96,23 @@ class QuadraticInequalityGreaterFactory(QuadraticFactory):
         super().__init__(operator_symbol='>')
 
 
+class QuadraticEqualLessFactory(QuadraticFactory):
+    """Quadratic Inequalities (less) or equal"""
+    def __init__(self):
+        super().__init__(operator_symbol='<=')
+
+
+class QuadraticEqualGreaterFactory(QuadraticFactory):
+    """Quadratic Inequalities (less) or equal"""
+    def __init__(self):
+        super().__init__(operator_symbol='>=')
+
+
 if __name__ == "__main__":
-    factory = QuadraticEquationFactory()
+    # factory = QuadraticEquationFactory()
     # factory = QuadraticInequalityLessFactory()
-    exe = factory.generate(level=4, amount=5)
+    factory = QuadraticInequalityGreaterFactory()
+    exe = factory.generate(level=2, amount=5)
     sol = factory.solve(exercises=exe)
     print(f"exercises: {exe}")
     print(f"solutions: {sol}")
