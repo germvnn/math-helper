@@ -4,6 +4,8 @@ Math Helper CLI is a command-line interface for generating and solving arithmeti
 including operations like addition, subtraction, multiplication, and division, as well
 as their fractional counterparts.
 
+### 17 April 2024 - Math Helper supports Quadratic equations|inequalities!
+
 ## Installation
 
 Before running the CLI, ensure you have Python 3.6+ installed on your system.
@@ -25,7 +27,8 @@ python cli.py -operation [OPERATION] -level [LEVEL] -amount [AMOUNT]
 ```
 
 Replace [OPERATION] with one of the following: addition, subtraction, multiplication, division,
-faddition (fraction addition), fsubtraction, fmultiplication, fdivision, paddition (percent addition), psubtraction
+faddition (fraction addition), fsubtraction, fmultiplication, fdivision, paddition (percent addition), psubtraction,
+qequation, qinequationl, qinequationg, qequalless, qequalgreater
 
 Replace [LEVEL] with the difficulty level of the exercises (as an integer).
 
@@ -36,12 +39,12 @@ Replace [AMOUNT] with the number of exercises to generate (as an integer).
 To generate 5 addition exercises at level 1, use the following command:
 
 ```bash
-python cli.py -operation paddition -level 2 -amount 15
+python cli.py -operation qequalgreater -level 3 -amount 2
 ```
 
 The CLI will output two .pdf files with exercises and their solutions.
 
-![alt text](https://i.imgur.com/zFB7dXv.png)
+![alt text](https://i.imgur.com/tbahpEU.png)
 
 ## Contirbuting
 Feel free to fork the repository, make your changes, and submit a pull request if you have a new feature or bug fix.
