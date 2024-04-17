@@ -1,3 +1,5 @@
+import glob
+import os
 import re
 
 import numpy as np
@@ -14,11 +16,16 @@ def latexify(text):
 
 
 def exercise_string(numerator, exercise, end_line):
-    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {end_line}")
+    return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {end_line}")
 
 
 def solution_string(numerator, exercise, comparison_operator, solution):
-    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
+    return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {comparison_operator} {latexify(solution)}")
+
+
+def quadratic_solution_string(x1, x2, delta):
+    solution_text = rf"x_1 = {x1}, ~~~~ x_2 = {x2}, ~~~~ \Delta = {delta}"
+    return NoEscape(r'\begin{center}\Large $' + solution_text + r'$ \end{center}')
 
 
 def extract_quadratic_coefficients(exercise: str):
@@ -34,7 +41,7 @@ def extract_quadratic_coefficients(exercise: str):
     return a, b, c
 
 
-def plot_quadratic(exercise: str, solution: dict):
+def plot_quadratic(numerator: int, exercise: str, solution: dict):
     roots = solution['roots']
     a, b, c = extract_quadratic_coefficients(exercise)
 
@@ -79,7 +86,7 @@ def plot_quadratic(exercise: str, solution: dict):
         plt.scatter(roots, [0, 0], facecolors='none', **scatter_kwargs)
 
     plt.legend()
-    plt.show()
+    plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
 
 
 if __name__ == "__main__":
@@ -94,3 +101,10 @@ if __name__ == "__main__":
 
     for equation, info in details.items():
         plot_quadratic(equation, info)
+
+
+def remove_plots():
+    files_to_remove = glob.glob(os.path.join(os.path.dirname(__file__), 'plot*'))
+
+    for file_path in files_to_remove:
+        os.remove(file_path)

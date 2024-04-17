@@ -1,6 +1,6 @@
 import argparse
 from MathGenerator.arithmetic import factories as arithmetic
-from PDFGenerator.builder import Director, MathPDFBuilder
+from PDFGenerator.builder import Director, ArithmeticPDFBuilder
 
 
 class Factory:
@@ -70,7 +70,7 @@ def main():
 
     # Initialize Director and his PDFBuilder
     director = Director()
-    director.builder = MathPDFBuilder()
+    director.builder = ArithmeticPDFBuilder()
 
     # Create PDF based on generated exercises
     director.build_exercises(title=f"Exercises from {factory.__class__.__name__}",

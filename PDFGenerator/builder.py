@@ -5,7 +5,7 @@ import os
 
 from pylatex import (Document,StandAloneGraphic, LineBreak,
                      Section, PageStyle,Head, MiniPage,
-                     Foot, LargeText)
+                     Foot, LargeText, Figure, NoEscape)
 from pylatex.utils import bold
 
 from PDFGenerator import constants as const
@@ -78,9 +78,10 @@ class PDFBuilder(ABC):
                               compiler='pdflatex',
                               clean_tex=True)
         self._setup_document()
+        utils.remove_plots()
 
 
-class MathPDFBuilder(PDFBuilder):
+class ArithmeticPDFBuilder(PDFBuilder):
     """
     Builder implementation that constructs parts of a MathPDF
     document. It keeps track of the components added to the product
@@ -92,21 +93,50 @@ class MathPDFBuilder(PDFBuilder):
             self.doc.append(LargeText(bold(title)))
 
     def insert_exercise(self, numerator: int, exercise: str) -> None:
-        end_line = "" if '=' in exercise else "= ?"
+
         with self.doc.create(
                 Section(utils.exercise_string(numerator=numerator,
                                               exercise=exercise,
-                                              end_line=end_line), numbering=False)
+                                              end_line="= ?"), numbering=False)
         ):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
-        comparison_operator = '~~--~~' if '=' in exercise else '='
         with self.doc.create(Section(utils.solution_string(numerator=numerator,
                                                            exercise=exercise,
-                                                           comparison_operator=comparison_operator,
+                                                           comparison_operator="=",
                                                            solution=solution), numbering=False)):
             pass
+
+
+class QuadraticPDFBuilder(PDFBuilder):
+    def insert_header(self, title) -> None:
+        with self.doc.create(MiniPage(align='c')):
+            self.doc.append(LargeText(bold(title)))
+
+    def insert_exercise(self, numerator: int, exercise: str) -> None:
+        with self.doc.create(
+                Section(utils.exercise_string(numerator=numerator,
+                                              exercise=exercise,
+                                              end_line=""), numbering=False)
+        ):
+            pass
+
+    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
+        with self.doc.create(
+                Section(utils.exercise_string(numerator=numerator,
+                                              exercise=exercise,
+                                              end_line=""), numbering=False)
+        ):
+            self.doc.append(utils.quadratic_solution_string(x1=solution['roots'][0],
+                                                            x2=solution['roots'][1],
+                                                            delta=solution['delta']))
+            img_path = os.path.join(os.path.dirname(__file__), f'plot{numerator}.png')
+            utils.plot_quadratic(numerator=numerator,
+                                 exercise=exercise,
+                                 solution=solution)
+            with self.doc.create(Figure(position="h!")) as plot:
+                plot.add_image(img_path, width=NoEscape(r'0.57\textwidth'))
 
 
 class Director:
@@ -152,18 +182,36 @@ class Director:
 
 if __name__ == "__main__":
     director = Director()
-    builder = MathPDFBuilder()
+    # builder = ArithmeticPDFBuilder()
+    # director.builder = builder
+    # examples = ['0.1 + 0.1 = x', '0.06 + 0.08',
+    #             '0.1 + 0.03', '0.09 + 0.06',
+    #             '0.1 + 0.09', '0.08 + 0.07',
+    #             '0.08 + 0.09', '0.09 + 0.06',
+    #             '0.07 + 0.1', '0.09 + 0.08']
+    # examples_solutions = {'0.1 + 0.1 = x': 'x = 0.2', '0.06 + 0.08': 0.14,
+    #                       '0.1 + 0.03': 0.13, '0.09 + 0.06': 0.15,
+    #                       '0.1 + 0.09': 0.19, '0.08 + 0.07': 0.15,
+    #                       '0.08 + 0.09': 0.17, '0.07 + 0.1': 0.17,
+    #                       '0.09 + 0.08': 0.17}
+    builder = QuadraticPDFBuilder()
     director.builder = builder
-    examples = ['0.1 + 0.1 = x', '0.06 + 0.08',
-                '0.1 + 0.03', '0.09 + 0.06',
-                '0.1 + 0.09', '0.08 + 0.07',
-                '0.08 + 0.09', '0.09 + 0.06',
-                '0.07 + 0.1', '0.09 + 0.08']
-    examples_solutions = {'0.1 + 0.1 = x': 'x = 0.2', '0.06 + 0.08': 0.14,
-                          '0.1 + 0.03': 0.13, '0.09 + 0.06': 0.15,
-                          '0.1 + 0.09': 0.19, '0.08 + 0.07': 0.15,
-                          '0.08 + 0.09': 0.17, '0.07 + 0.1': 0.17,
-                          '0.09 + 0.08': 0.17}
+
+    examples = [
+        '-x^2 + 0x + 1 > 0',
+        '2x^2 + 5x + 2 >= 0',
+        'x^2 + 2x + -3 < 0',
+        '-2x^2 + 3x + 0 <= 0',
+        '-x^2 + -5x + -4 = 0'
+    ]
+
+    examples_solutions = {
+        '-x^2 + 0x + 1 > 0': {'roots': (-1.0, 1.0), 'parabola_direction': 'down', 'delta': 4},
+        '2x^2 + 5x + 2 >= 0': {'roots': (-0.5, -2.0), 'parabola_direction': 'up', 'delta': 9},
+        'x^2 + 2x + -3 < 0': {'roots': (1.0, -3.0), 'parabola_direction': 'up', 'delta': 16},
+        '-2x^2 + 3x + 0 <= 0': {'roots': (0.0, 1.5), 'parabola_direction': 'down', 'delta': 9},
+        '-x^2 + -5x + -4 = 0': {'roots': (-4.0, -1.0), 'parabola_direction': 'down', 'delta': 9}
+    }
 
     director.build_exercises(title="Exercises", exercises=examples, filename="exercises")
     director.build_solutions(title="Solutions", exercises=examples_solutions, filename="solutions")
