@@ -116,17 +116,17 @@ class QuadraticPDFBuilder(PDFBuilder):
 
     def insert_exercise(self, numerator: int, exercise: str) -> None:
         with self.doc.create(
-                Section(utils.exercise_string(numerator=numerator,
-                                              exercise=exercise,
-                                              end_line=""), numbering=False)
+                Section(utils.quadratic_exercise_string(numerator=numerator,
+                                                        exercise=exercise,
+                                                        end_line=""), numbering=False)
         ):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
         with self.doc.create(
-                Section(utils.exercise_string(numerator=numerator,
-                                              exercise=exercise,
-                                              end_line=""), numbering=False)
+                Section(utils.quadratic_exercise_string(numerator=numerator,
+                                                        exercise=exercise,
+                                                        end_line=""), numbering=False)
         ):
             self.doc.append(utils.quadratic_solution_string(roots=solution['roots'],
                                                             delta=solution['delta']))

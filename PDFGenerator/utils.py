@@ -16,13 +16,17 @@ def latexify(text):
 
 
 def exercise_string(numerator, exercise, end_line):
+    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {end_line}")
+
+
+def quadratic_exercise_string(numerator, exercise, end_line):
     exercise = exercise.replace('<=', r'\leq')
     exercise = exercise.replace('>=', r'\geq')
     return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {end_line}")
 
 
 def solution_string(numerator, exercise, comparison_operator, solution):
-    return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {comparison_operator} {latexify(solution)}")
+    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
 
 
 def quadratic_solution_string(roots, delta):

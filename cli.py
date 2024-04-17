@@ -1,6 +1,7 @@
 import argparse
 from MathGenerator.arithmetic import factories as arithmetic
-from PDFGenerator.builder import Director, ArithmeticPDFBuilder
+import MathGenerator.algebra.quadratic as quadratic
+from PDFGenerator.builder import Director, ArithmeticPDFBuilder, QuadraticPDFBuilder
 
 
 class Factory:
@@ -18,18 +19,24 @@ class Factory:
         - An instance of the requested factory class.
         """
         factories = {
-            'addition': arithmetic.AdditionFactory,
-            'subtraction': arithmetic.SubtractionFactory,
-            'multiplication': arithmetic.MultiplicationFactory,
-            'division': arithmetic.DivisionFactory,
-            'faddition': arithmetic.FractionAdditionFactory,
-            'fsubtraction': arithmetic.FractionSubtractionFactory,
-            'fmultiplication': arithmetic.FractionMultiplicationFactory,
-            'fdivision': arithmetic.FractionDivisionFactory,
-            'paddition': arithmetic.PercentAdditionFactory,
-            'psubtraction': arithmetic.PercentSubtractionFactory
+            'addition': (arithmetic.AdditionFactory, ArithmeticPDFBuilder),
+            'subtraction': (arithmetic.SubtractionFactory, ArithmeticPDFBuilder),
+            'multiplication': (arithmetic.MultiplicationFactory, ArithmeticPDFBuilder),
+            'division': (arithmetic.DivisionFactory, ArithmeticPDFBuilder),
+            'faddition': (arithmetic.FractionAdditionFactory, ArithmeticPDFBuilder),
+            'fsubtraction': (arithmetic.FractionSubtractionFactory, ArithmeticPDFBuilder),
+            'fmultiplication': (arithmetic.FractionMultiplicationFactory, ArithmeticPDFBuilder),
+            'fdivision': (arithmetic.FractionDivisionFactory, ArithmeticPDFBuilder),
+            'paddition': (arithmetic.PercentAdditionFactory, ArithmeticPDFBuilder),
+            'psubtraction': (arithmetic.PercentSubtractionFactory, ArithmeticPDFBuilder),
+            'qequation': (quadratic.QuadraticEquationFactory, QuadraticPDFBuilder),
+            'qinequationl': (quadratic.QuadraticInequalityLessFactory, QuadraticPDFBuilder),
+            'qinequationg': (quadratic.QuadraticInequalityGreaterFactory, QuadraticPDFBuilder),
+            'qequalless': (quadratic.QuadraticEqualLessFactory, QuadraticPDFBuilder),
+            'qequalgreater': (quadratic.QuadraticEqualGreaterFactory, QuadraticPDFBuilder)
         }
-        return factories[operation]()
+        factory_class, builder_class = factories[operation]
+        return factory_class(), builder_class()
 
 
 def main():
@@ -52,7 +59,12 @@ def main():
         'fmultiplication',
         'fdivision',
         'paddition',
-        'psubtraction'],
+        'psubtraction',
+        'qequation',
+        'qinequationl',
+        'qinequationg',
+        'qequalless',
+        'qequalgreater'],
                         required=True, help='Type of operation')
     parser.add_argument('-level', type=int, required=True, help='Difficulty level of the exercises')
     parser.add_argument('-amount', type=int, required=True, help='Amount of exercises to generate')
@@ -60,7 +72,7 @@ def main():
     args = parser.parse_args()
 
     # Initialize Factory based on passed argument
-    factory = Factory.create(operation=args.operation)
+    factory, builder = Factory.create(operation=args.operation)
 
     # Generate {args.amount} exercises
     exercises = factory.generate(level=args.level, amount=args.amount)
@@ -70,7 +82,7 @@ def main():
 
     # Initialize Director and his PDFBuilder
     director = Director()
-    director.builder = ArithmeticPDFBuilder()
+    director.builder = builder
 
     # Create PDF based on generated exercises
     director.build_exercises(title=f"Exercises from {factory.__class__.__name__}",
