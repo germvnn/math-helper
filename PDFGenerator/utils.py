@@ -22,6 +22,11 @@ def decimal_to_fraction(expression):
     # Convert every decimal part into fraction
     for dec in decimals:
         fraction = Fraction(float(dec)).limit_denominator()
+        # Round expression if fraction too complicated
+        if len(str(fraction.denominator)) > 3:
+            # TODO: Implement \\approx somehow
+            expression = expression.replace(dec, str(round(float(dec), 4)))
+            continue
         expression = expression.replace(dec, str(fraction))
     # Convert every decimal parts to LaTeX formatted fractions
     fractions = re.findall(r"(\d+)/(\d+)", expression)
@@ -72,7 +77,6 @@ def extract_quadratic_coefficients(exercise: str):
 
 
 def plot_quadratic(numerator: int, exercise: str, solution: dict):
-    roots = solution['roots']
     a, b, c = extract_quadratic_coefficients(exercise)
 
     # Define the quadratic function
