@@ -56,6 +56,8 @@ class QuadraticFactory(ExerciseFactory):
             c = float(coeffs[2][2] if coeffs[2][2] else 0)
 
             delta = b ** 2 - 4 * a * c
+            # Format delta as integer if so
+            delta = int(delta) if int(delta) - delta == 0 else delta
 
             # Calculate roots based on delta
             if delta > 0:
