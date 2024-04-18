@@ -1,3 +1,4 @@
+from fractions import Fraction
 import glob
 import os
 import re
@@ -15,6 +16,20 @@ def latexify(text):
     return text.replace('%', '\\%')
 
 
+def decimal_to_fraction(expression):
+    # Look for decimal parts in expression
+    decimals = re.findall(r"[-+]?[0-9]*\.?[0-9]+", expression)
+    # Convert every decimal part into fraction
+    for dec in decimals:
+        fraction = Fraction(float(dec)).limit_denominator()
+        expression = expression.replace(dec, str(fraction))
+    # Convert every decimal parts to LaTeX formatted fractions
+    fractions = re.findall(r"(\d+)/(\d+)", expression)
+    for num, den in fractions:
+        expression = expression.replace(f"{num}/{den}", f"\\frac{{{num}}}{{{den}}}")
+    return expression
+
+
 def exercise_string(numerator, exercise, end_line):
     return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {end_line}")
 
@@ -22,7 +37,7 @@ def exercise_string(numerator, exercise, end_line):
 def quadratic_exercise_string(numerator, exercise, end_line):
     exercise = exercise.replace('<=', r'\leq')
     exercise = exercise.replace('>=', r'\geq')
-    return NoEscape(rf"{numerator}.~~~$${latexify(exercise)}$$ {end_line}")
+    return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$ {end_line}")
 
 
 def solution_string(numerator, exercise, comparison_operator, solution):
@@ -32,9 +47,10 @@ def solution_string(numerator, exercise, comparison_operator, solution):
 def quadratic_solution_string(roots, delta):
     if isinstance(roots, tuple):
         if len(roots) == 1:
-            solution_text = rf"x_1 = x_2 = {roots[0]}, ~~~~ \Delta = {delta}"
+            solution_text = rf"x_1 = x_2 = {decimal_to_fraction(str(roots[0]))}, ~~~~ \Delta = {delta}"
         elif len(roots) == 2:
-            solution_text = rf"x_1 = {roots[0]}, ~~~~ x_2 = {roots[1]}, ~~~~ \Delta = {delta}"
+            solution_text = rf"x_1 = {decimal_to_fraction(str(roots[0]))},\
+             ~~~~ x_2 = {decimal_to_fraction(str(roots[1]))}, ~~~~ \Delta = {delta}"
         else:
             solution_text = "WRONG FORMAT"
     else:
@@ -46,12 +62,12 @@ def extract_quadratic_coefficients(exercise: str):
     # Normalize exercise
     exercise = re.split('=|<|>|<=|>=', exercise.replace(' ', ''))[0]
     # Extraction coefficients a, b, c
-    coeffs = re.findall(r'([+-]?\d*\.?\d*)x\^2|([+-]?\d*\.?\d*)x|([+-]?\d+)', exercise)
+    coeffs = re.findall(r'([+-]?\d*\.?\d*)x\^2|([+-]?\d*\.?\d*)x|([+-]?\d*\.?\d+)', exercise)
     a = int(coeffs[0][0] if coeffs[0][0] != '' and coeffs[0][0] != '+' and coeffs[0][0] != '-' else (
         '1' if coeffs[0][0] == '' or coeffs[0][0] == '+' else '-1'))
     b = int(coeffs[1][1] if coeffs[1][1] != '' and coeffs[1][1] != '+' and coeffs[1][1] != '-' else (
         '1' if coeffs[1][1] == '' or coeffs[1][1] == '+' else '-1'))
-    c = int(coeffs[2][2] if coeffs[2][2] else 0)
+    c = float(coeffs[2][2] if coeffs[2][2] else 0)
     return a, b, c
 
 
