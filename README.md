@@ -36,7 +36,7 @@ Replace [AMOUNT] with the number of exercises to generate (as an integer).
 
 ### Example
 
-To generate 5 addition exercises at level 1, use the following command:
+To generate 2 quadratic inequality exercises at level 3, use the following command:
 
 ```bash
 python cli.py -operation qequalgreater -level 3 -amount 2
