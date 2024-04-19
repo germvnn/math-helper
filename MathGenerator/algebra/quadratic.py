@@ -7,15 +7,16 @@ from MathGenerator.abstracts import ExerciseFactory
 
 class QuadraticFactory(ExerciseFactory):
     """Class for managing Quadratic exercises"""
-    def __init__(self, operator_symbol=None):
+    def __init__(self, operator_symbol: str | None = None):
         super().__init__()
         self.operator = operator_symbol
         self.random_operator = True if self.operator is None else False
 
-    def generate(self, level, amount):
+    def generate(self, level: int, amount: int) -> list:
         exercises = []
         # Process of generating single quadratic exercise
         for _ in range(amount):
+            # Set random operator if not provided
             self.operator = random.choice(['=', '>', '<', '>=', '<=']) if self.random_operator else self.operator
             a = random.randint(-level, level)
             # Making sure that equation will not be linear
@@ -34,9 +35,9 @@ class QuadraticFactory(ExerciseFactory):
                     delta *= -1 if random.choice([True, False]) else 0
 
             c = (b ** 2 - delta) / (4 * a)
-            # TODO: Temporary solution. Fractions have to be implemented
             a_str = f"{'-' if a == -1 else '' if a == 1 else a}"
             exercises.append(f"{a_str}x^2 + {b}x + {c} {self.operator} 0")
+            # Reset operator
             self.operator = None if self.random_operator else self.operator
 
         return exercises
