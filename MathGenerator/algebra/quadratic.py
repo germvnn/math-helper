@@ -7,14 +7,16 @@ from MathGenerator.abstracts import ExerciseFactory
 
 class QuadraticFactory(ExerciseFactory):
     """Class for managing Quadratic exercises"""
-    def __init__(self, operator_symbol):
+    def __init__(self, operator_symbol=None):
         super().__init__()
-        self.operator_symbol = operator_symbol
+        self.operator = operator_symbol
+        self.random_operator = True if self.operator is None else False
 
     def generate(self, level, amount):
         exercises = []
         # Process of generating single quadratic exercise
         for _ in range(amount):
+            self.operator = random.choice(['=', '>', '<', '>=', '<=']) if self.random_operator else self.operator
             a = random.randint(-level, level)
             # Making sure that equation will not be linear
             while a == 0:
@@ -34,7 +36,8 @@ class QuadraticFactory(ExerciseFactory):
             c = (b ** 2 - delta) / (4 * a)
             # TODO: Temporary solution. Fractions have to be implemented
             a_str = f"{'-' if a == -1 else '' if a == 1 else a}"
-            exercises.append(f"{a_str}x^2 + {b}x + {c} {self.operator_symbol} 0")
+            exercises.append(f"{a_str}x^2 + {b}x + {c} {self.operator} 0")
+            self.operator = None if self.random_operator else self.operator
 
         return exercises
 
@@ -44,7 +47,7 @@ class QuadraticFactory(ExerciseFactory):
         # Process of solving single exercise
         for exercise in exercises:
             # Prepare exercise string for regular expression
-            clean_exercise = exercise.replace(" ", "").replace(f"{self.operator_symbol}0", "")
+            clean_exercise = exercise.replace(" ", "").replace(f"{self.operator}0", "")
             # Regular expression which looks up at a, b, c
             coeffs = re.findall(r'([+-]?\d*\.?\d*)x\^2|([+-]?\d*\.?\d*)x|([+-]?\d*\.?\d+)', clean_exercise)
 
@@ -113,8 +116,8 @@ class QuadraticEqualGreaterFactory(QuadraticFactory):
 if __name__ == "__main__":
     # factory = QuadraticEquationFactory()
     # factory = QuadraticInequalityLessFactory()
-    factory = QuadraticInequalityGreaterFactory()
-    exe = factory.generate(level=2, amount=5)
+    factory = QuadraticFactory()
+    exe = factory.generate(level=2, amount=20)
     sol = factory.solve(exercises=exe)
     print(f"exercises: {exe}")
     print(f"solutions: {sol}")

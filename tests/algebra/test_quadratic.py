@@ -20,10 +20,10 @@ def test_quadratic_generate(factory_class, level):
     assert len(exercises) == amount, f"Generated {len(exercises)} exercises, expected {amount}"
 
     for exercise in exercises:
-        assert factory.operator_symbol in exercise, f"Operator {factory.operator_symbol} not found in {exercise}"
+        assert factory.operator in exercise, f"Operator {factory.operator} not found in {exercise}"
 
         # Assuming the quadratic exercise is structured like 'ax^2 + bx + c operator 0'
-        components = exercise.split(f" {factory.operator_symbol} ")
+        components = exercise.split(f" {factory.operator} ")
 
         assert components[1] is '0'
         left_side = components[0]  # Only one side as the other is assumed to be '0'
