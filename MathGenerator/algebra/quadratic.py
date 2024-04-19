@@ -13,6 +13,7 @@ class QuadraticFactory(ExerciseFactory):
         self.random_operator = True if self.operator is None else False
 
     def generate(self, level: int, amount: int) -> list:
+        # TODO: Parentheses for b, c < 0 temporary done in PDF utils.
         exercises = []
         # Process of generating single quadratic exercise
         for _ in range(amount):
@@ -43,6 +44,7 @@ class QuadraticFactory(ExerciseFactory):
         return exercises
 
     def solve(self, exercises: list) -> dict:
+        # TODO: Adjust regexp for equations like x^2 + (-3)x + (-3) = 0
         solutions = {}
 
         # Process of solving single exercise
@@ -50,7 +52,7 @@ class QuadraticFactory(ExerciseFactory):
             # Prepare exercise string for regular expression
             clean_exercise = exercise.replace(" ", "").replace(f"{self.operator}0", "")
             # Regular expression which looks up at a, b, c
-            coeffs = re.findall(r'([+-]?\d*\.?\d*)x\^2|([+-]?\d*\.?\d*)x|([+-]?\d*\.?\d+)', clean_exercise)
+            coeffs = re.findall(r'(-?\d*\.?\d*)x\^2|(-?\d*\.?\d*)x|(-?\d*\.?\d+)', clean_exercise)
 
             # Read factor from re findings
             a = int(coeffs[0][0] if coeffs[0][0] != '' and coeffs[0][0] != '+' and coeffs[0][0] != '-' else (

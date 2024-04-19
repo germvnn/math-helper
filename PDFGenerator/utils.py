@@ -42,6 +42,10 @@ def exercise_string(numerator, exercise, end_line):
 def quadratic_exercise_string(numerator, exercise, end_line):
     exercise = exercise.replace('<=', r'\leq')
     exercise = exercise.replace('>=', r'\geq')
+    # TODO: Temporary solution. Parentheses must be implemented in generator
+    a, b, c = extract_quadratic_coefficients(exercise)
+    for coeff in [b, c]:
+        exercise = exercise.replace(str(coeff), f"({coeff})") if coeff < 0 else exercise
     return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$ {end_line}")
 
 
@@ -67,7 +71,7 @@ def extract_quadratic_coefficients(exercise: str):
     # Normalize exercise
     exercise = re.split('=|<|>|<=|>=', exercise.replace(' ', ''))[0]
     # Extraction coefficients a, b, c
-    coeffs = re.findall(r'([+-]?\d*\.?\d*)x\^2|([+-]?\d*\.?\d*)x|([+-]?\d*\.?\d+)', exercise)
+    coeffs = re.findall(r'(-?\d*\.?\d*)x\^2|(-?\d*\.?\d*)x|(-?\d*\.?\d+)', exercise)
     a = int(coeffs[0][0] if coeffs[0][0] != '' and coeffs[0][0] != '+' and coeffs[0][0] != '-' else (
         '1' if coeffs[0][0] == '' or coeffs[0][0] == '+' else '-1'))
     b = int(coeffs[1][1] if coeffs[1][1] != '' and coeffs[1][1] != '+' and coeffs[1][1] != '-' else (
@@ -76,6 +80,7 @@ def extract_quadratic_coefficients(exercise: str):
     return a, b, c
 
 
+# TODO: Consider class for plots
 def plot_quadratic(numerator: int, exercise: str, solution: dict):
     a, b, c = extract_quadratic_coefficients(exercise)
 
