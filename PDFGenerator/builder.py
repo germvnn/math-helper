@@ -78,7 +78,7 @@ class PDFBuilder(ABC):
                               compiler='pdflatex',
                               clean_tex=True)
         self._setup_document()
-        utils.remove_plots()
+        utils.Plot.remove()
 
 
 class ArithmeticPDFBuilder(PDFBuilder):
@@ -131,7 +131,7 @@ class QuadraticPDFBuilder(PDFBuilder):
             self.doc.append(utils.quadratic_solution_string(roots=solution['roots'],
                                                             delta=solution['delta']))
             img_path = os.path.join(os.path.dirname(__file__), f'plot{numerator}.png')
-            utils.plot_quadratic(numerator=numerator,
+            utils.Plot.quadratic(numerator=numerator,
                                  exercise=exercise,
                                  solution=solution)
             with self.doc.create(Figure(position="h!")) as plot:

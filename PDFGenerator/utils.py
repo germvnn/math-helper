@@ -8,14 +8,6 @@ import matplotlib.pyplot as plt
 from pylatex import NoEscape
 
 
-def latexify(text):
-    """Escape LaTeX special characters in a given text."""
-    # TODO: Implement functionality for the rest special characters
-    if isinstance(text, (int, float)):
-        return text
-    return text.replace('%', '\\%')
-
-
 def decimal_to_fraction(expression):
     # Look for decimal parts in expression
     decimals = re.findall(r"[-+]?[0-9]*\.?[0-9]+", expression)
@@ -35,8 +27,33 @@ def decimal_to_fraction(expression):
     return expression
 
 
+def extract_quadratic_coefficients(exercise: str):
+    # Normalize exercise
+    exercise = re.split('=|<|>|<=|>=', exercise.replace(' ', ''))[0]
+    # Extraction coefficients a, b, c
+    coeffs = re.findall(r'(-?\d*\.?\d*)x\^2|(-?\d*\.?\d*)x|(-?\d*\.?\d+)', exercise)
+    a = int(coeffs[0][0] if coeffs[0][0] != '' and coeffs[0][0] != '+' and coeffs[0][0] != '-' else (
+        '1' if coeffs[0][0] == '' or coeffs[0][0] == '+' else '-1'))
+    b = int(coeffs[1][1] if coeffs[1][1] != '' and coeffs[1][1] != '+' and coeffs[1][1] != '-' else (
+        '1' if coeffs[1][1] == '' or coeffs[1][1] == '+' else '-1'))
+    c = float(coeffs[2][2] if coeffs[2][2] else 0)
+    return a, b, c
+
+
+def latexify(text):
+    """Escape LaTeX special characters in a given text."""
+    # TODO: Implement functionality for the rest special characters
+    if isinstance(text, (int, float)):
+        return text
+    return text.replace('%', '\\%')
+
+
 def exercise_string(numerator, exercise, end_line):
     return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {end_line}")
+
+
+def solution_string(numerator, exercise, comparison_operator, solution):
+    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
 
 
 def quadratic_exercise_string(numerator, exercise, end_line):
@@ -47,10 +64,6 @@ def quadratic_exercise_string(numerator, exercise, end_line):
     for coeff in [b, c]:
         exercise = exercise.replace(str(coeff), f"({coeff})") if coeff < 0 else exercise
     return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$ {end_line}")
-
-
-def solution_string(numerator, exercise, comparison_operator, solution):
-    return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
 
 
 def quadratic_solution_string(roots, delta):
@@ -67,78 +80,67 @@ def quadratic_solution_string(roots, delta):
     return NoEscape(r'\begin{center}\Large $' + solution_text + r'$ \end{center}')
 
 
-def extract_quadratic_coefficients(exercise: str):
-    # Normalize exercise
-    exercise = re.split('=|<|>|<=|>=', exercise.replace(' ', ''))[0]
-    # Extraction coefficients a, b, c
-    coeffs = re.findall(r'(-?\d*\.?\d*)x\^2|(-?\d*\.?\d*)x|(-?\d*\.?\d+)', exercise)
-    a = int(coeffs[0][0] if coeffs[0][0] != '' and coeffs[0][0] != '+' and coeffs[0][0] != '-' else (
-        '1' if coeffs[0][0] == '' or coeffs[0][0] == '+' else '-1'))
-    b = int(coeffs[1][1] if coeffs[1][1] != '' and coeffs[1][1] != '+' and coeffs[1][1] != '-' else (
-        '1' if coeffs[1][1] == '' or coeffs[1][1] == '+' else '-1'))
-    c = float(coeffs[2][2] if coeffs[2][2] else 0)
-    return a, b, c
+class Plot:
 
+    @staticmethod
+    def quadratic(numerator: int, exercise: str, solution: dict):
+        a, b, c = extract_quadratic_coefficients(exercise)
 
-# TODO: Consider class for plots
-def plot_quadratic(numerator: int, exercise: str, solution: dict):
-    a, b, c = extract_quadratic_coefficients(exercise)
+        # Define the quadratic function
+        def f(x):
+            return a * x ** 2 + b * x + c
 
-    # Define the quadratic function
-    def f(x):
-        return a * x ** 2 + b * x + c
+        # Determine the x range for plotting
+        if isinstance(solution['roots'], tuple):
+            # If roots exist, use them to determine the x range for plotting
+            x_range = max(solution['roots']) - min(solution['roots'])
+            x_range = x_range if x_range != 0 else 2
+            x = np.linspace(min(solution['roots']) - 0.5 * x_range, max(solution['roots']) + 0.5 * x_range, 400)
+        else:
+            # If no real roots, use a default range centered at the vertex
+            vertex_x = -b / (2 * a)
+            x = np.linspace(vertex_x - 2, vertex_x + 2, 400)
+        y = f(x)
 
-    # Determine the x range for plotting
-    if isinstance(solution['roots'], tuple):
-        # If roots exist, use them to determine the x range for plotting
-        x_range = max(solution['roots']) - min(solution['roots'])
-        x_range = x_range if x_range != 0 else 2
-        x = np.linspace(min(solution['roots']) - 0.5 * x_range, max(solution['roots']) + 0.5 * x_range, 400)
-    else:
-        # If no real roots, use a default range centered at the vertex
-        vertex_x = -b / (2 * a)
-        x = np.linspace(vertex_x - 2, vertex_x + 2, 400)
-    y = f(x)
+        # Generate the plot
+        plt.figure(figsize=(4, 3))
+        plt.plot(x, y, label=f'y = {a:.1f}x^2 + {b:.1f}x + {c:.1f}', lw=2.5, color='blue')
+        plt.axhline(0, color='black', linewidth=1)
+        plt.axvline(0, color='black', linewidth=1)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.grid(False)
 
-    # Generate the plot
-    plt.figure(figsize=(4, 3))
-    plt.plot(x, y, label=f'y = {a:.1f}x^2 + {b:.1f}x + {c:.1f}', lw=2.5, color='blue')
-    plt.axhline(0, color='black', linewidth=1)
-    plt.axvline(0, color='black', linewidth=1)
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.grid(False)
+        # Fill settings
+        fill = (y > 0) if '>' in exercise else ((y < 0) if '<' in exercise else None)
+        fill_kwargs = {'where': fill, 'color': 'gray', 'alpha': 0.7, 'hatch': '//'}
 
-    # Fill settings
-    fill = (y > 0) if '>' in exercise else ((y < 0) if '<' in exercise else None)
-    fill_kwargs = {'where': fill, 'color': 'gray', 'alpha': 0.7, 'hatch': '//'}
+        # Scatter settings
+        color = 'red' if '=' in exercise else None  # = indicates that scatter must be filled
+        scatter_kwargs = {'facecolors': color, 'zorder': 5, 's': 35, 'edgecolors': 'red', 'linewidths': 1.5}
 
-    # Scatter settings
-    color = 'red' if '=' in exercise else None  # = indicates that scatter must be filled
-    scatter_kwargs = {'facecolors': color, 'zorder': 5, 's': 35, 'edgecolors': 'red', 'linewidths': 1.5}
+        # Check for delta and apply the appropriate fill and scatter properties
+        if solution['delta'] > 0:
+            # When delta is positive, plot the roots
+            plt.scatter(solution['roots'], [0, 0], **scatter_kwargs)
+            if fill is not None:
+                plt.fill_between(x, y, 0, **fill_kwargs)
+        elif solution['delta'] == 0:
+            # When delta is zero, plot the single root
+            plt.scatter(solution['roots'], [0], **scatter_kwargs)
+            if fill is not None:
+                plt.fill_between(x, y, 0, **fill_kwargs)
+        else:
+            # When delta is negative, no real roots to plot, but the parabola still needs to be shown
+            if fill is not None:
+                plt.fill_between(x, y, 0, **fill_kwargs)
 
-    # Check for delta and apply the appropriate fill and scatter properties
-    if solution['delta'] > 0:
-        # When delta is positive, plot the roots
-        plt.scatter(solution['roots'], [0, 0], **scatter_kwargs)
-        if fill is not None:
-            plt.fill_between(x, y, 0, **fill_kwargs)
-    elif solution['delta'] == 0:
-        # When delta is zero, plot the single root
-        plt.scatter(solution['roots'], [0], **scatter_kwargs)
-        if fill is not None:
-            plt.fill_between(x, y, 0, **fill_kwargs)
-    else:
-        # When delta is negative, no real roots to plot, but the parabola still needs to be shown
-        if fill is not None:
-            plt.fill_between(x, y, 0, **fill_kwargs)
+        plt.legend()
+        plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
 
-    plt.legend()
-    plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
+    @staticmethod
+    def remove():
+        files_to_remove = glob.glob(os.path.join(os.path.dirname(__file__), 'plot*'))
 
-
-def remove_plots():
-    files_to_remove = glob.glob(os.path.join(os.path.dirname(__file__), 'plot*'))
-
-    for file_path in files_to_remove:
-        os.remove(file_path)
+        for file_path in files_to_remove:
+            os.remove(file_path)
