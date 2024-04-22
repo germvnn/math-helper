@@ -64,16 +64,21 @@ class SingleLinearFactory(LinearFactory):
         self.operator = operator_symbol
         self.random_operator = True if self.operator is None else False
 
+    # TODO: Consider fractions for higher levels
     def generate(self, level: int, amount: int):
         exercises = []
         for _ in range(amount):
             # Assign operator if not provided
             self.operator = random.choice(['=', '>', '<', '>=', '<=']) if self.random_operator else self.operator
 
-            task_type = random.choices(
-                ['precise', 'identity', 'no solution'],
-                weights=[60, 20, 20],
-            )[0]
+            # TODO: Think about this solution
+            if self.operator == '=':
+                task_type = random.choices(
+                    ['precise', 'identity', 'no solution'],
+                    weights=[60, 20, 20],
+                )[0]
+            else:
+                task_type = 'precise'
 
             # Match number generator based on task type
             match task_type:
@@ -158,6 +163,6 @@ class LinearFunctionFactory(LinearFactory):
 
 
 if __name__ == "__main__":
-    factory = SingleLinearEquationFactory()
+    factory = SingleLinearFactory()
     exe = factory.generate(level=10, amount=15)
     print(f"Exercises: {exe}")
