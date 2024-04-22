@@ -1,4 +1,5 @@
 import random
+import re
 
 from MathGenerator.abstracts import ExerciseFactory
 
@@ -41,6 +42,48 @@ def format_terms(a, b, variable='x'):
         return f"{term_a}{term_b}"
 
 
+def extract_coefficients(expression: str):
+    # Normalize expression by removing spaces and splitting at the relational operator
+    expression = expression.replace(' ', '')
+
+    # Enhanced regex to capture terms with x (including default coefficients) and constants
+    coeffs = re.findall(r'([+-]?\d*\.?\d*)x|([+-]?\d+\.?\d*)', expression)
+
+    a = 0
+    b = 0
+
+    # Aggregate coefficients for x and constant terms
+    found_x = False
+    for coeff_pair in coeffs:
+        if 'x' in expression and coeff_pair[0] != '':
+            if coeff_pair[0] == '-':
+                a -= 1
+            else:
+                a += float(coeff_pair[0])
+            found_x = True
+        if coeff_pair[1]:  # Constant term
+            b += float(coeff_pair[1])
+
+    # If 'x' is present in the expression but no coefficient has been assigned
+    if 'x' in expression and not found_x:
+        a = 1
+
+    return a, b
+
+
+def reverse_operator(operator):
+    """ Reverse the inequality operator """
+    if operator == '>':
+        return '<'
+    elif operator == '<':
+        return '>'
+    elif operator == '>=':
+        return '<='
+    elif operator == '<=':
+        return '>='
+    return operator
+
+
 class LinearFactory(ExerciseFactory):
     """Class for managing Linear exercises"""
 
@@ -75,42 +118,67 @@ class SingleLinearFactory(LinearFactory):
             if self.operator == '=':
                 task_type = random.choices(
                     ['precise', 'identity', 'no solution'],
-                    weights=[60, 20, 20],
+                    weights=[70, 10, 20],
                 )[0]
             else:
                 task_type = 'precise'
 
+            a = self.number_generator(level)
+            b = self.number_generator(level)
+
             # Match number generator based on task type
             match task_type:
                 case 'precise':
-                    a = self.number_generator(level)
-                    b = self.number_generator(level)
                     c = self.number_generator(level)
                     d = self.number_generator(level)
-
                     # Make sure that exercise is not identity
                     while a == c:
                         c = self.number_generator(level)
-
                 case 'identity':
-                    a = self.number_generator(level)
-                    b = self.number_generator(level)
                     c = a
                     d = b
-
                 case 'no solution':
-                    a = self.number_generator(level)
-                    b = self.number_generator(level)
                     c = a
                     d = b
                     while d == b:
                         d = self.number_generator(level)
-
                 case _:
                     raise ValueError("Invalid task type")
             exercises.append(f"{format_terms(a, b)} {self.operator} {format_terms(c, d)}")
             self.operator = None if self.random_operator else self.operator
         return exercises
+
+    # TODO: Fix results when '<' -> '>' etc.
+    def solve(self, exercises):
+        solutions = {}
+        for exercise in exercises:
+
+            parts = exercise.split(f" {self.operator} ")
+            left_side, right_side = parts[0], parts[1]
+
+            a, b = extract_coefficients(''.join(left_side))
+            c, d = extract_coefficients(''.join(right_side))
+
+            A = a - c
+            B = d - b
+
+            if A == 0:
+                if B == 0:
+                    solutions[exercise] = 'identity (all x)'
+                else:
+                    solutions[exercise] = 'no solution'
+            else:
+                x_solution = B / A
+                if self.operator == '=':
+                    solutions[exercise] = f'x = {x_solution}'
+                elif self.operator in ['>', '<', '>=', '<=']:
+                    # Reverse the operator if A is negative
+                    if A < 0:
+                        solutions[exercise] = f'x {reverse_operator(self.operator)} {x_solution}'
+                    else:
+                        solutions[exercise] = f'x {self.operator} {x_solution}'
+
+        return solutions
 
 
 class SingleLinearEquationFactory(SingleLinearFactory):
@@ -163,6 +231,8 @@ class LinearFunctionFactory(LinearFactory):
 
 
 if __name__ == "__main__":
-    factory = SingleLinearFactory()
-    exe = factory.generate(level=10, amount=15)
+    factory = SingleLinearFactory(operator_symbol="<=")
+    exe = factory.generate(level=1, amount=15)
+    sol = factory.solve(['x - 2 <= 2'])
     print(f"Exercises: {exe}")
+    print(f"Sol: {sol}")
