@@ -56,8 +56,10 @@ def solution_string(numerator, exercise, comparison_operator, solution):
     return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
 
 
-def linear_exercise_string():
-    pass
+def linear_exercise_string(numerator, exercise):
+    exercise = exercise.replace('<=', r'\leq')
+    exercise = exercise.replace('>=', r'\geq')
+    return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$")
 
 
 def quadratic_exercise_string(numerator, exercise):

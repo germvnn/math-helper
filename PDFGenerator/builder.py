@@ -109,17 +109,14 @@ class QuadraticPDFBuilder(PDFBuilder):
 
     def insert_exercise(self, numerator: int, exercise: str) -> None:
         with self.doc.create(
-                Section(utils.quadratic_exercise_string(numerator=numerator,
-                                                        exercise=exercise,
-                                                        end_line=""), numbering=False)
+            Section(utils.quadratic_exercise_string(numerator=numerator,exercise=exercise), numbering=False)
         ):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
         with self.doc.create(
                 Section(utils.quadratic_exercise_string(numerator=numerator,
-                                                        exercise=exercise,
-                                                        end_line=""), numbering=False)
+                                                        exercise=exercise), numbering=False)
         ):
             self.doc.append(utils.quadratic_solution_string(roots=solution['roots'],
                                                             delta=solution['delta']))
@@ -129,6 +126,18 @@ class QuadraticPDFBuilder(PDFBuilder):
                                  solution=solution)
             with self.doc.create(Figure(position="h!")) as plot:
                 plot.add_image(img_path, width=NoEscape(r'0.57\textwidth'))
+
+
+class LinearPDFBuilder(PDFBuilder):
+
+    def insert_exercise(self, numerator: int, exercise: str) -> None:
+        with self.doc.create(
+            Section(utils.linear_exercise_string(numerator=numerator, exercise=exercise), numbering=False)
+        ):
+            pass
+
+    def insert_solution(self, numerator: int, exercise: str, solution) -> None:
+        pass
 
 
 class Director:
@@ -174,42 +183,12 @@ class Director:
 
 if __name__ == "__main__":
     director = Director()
-    # builder = ArithmeticPDFBuilder()
-    # director.builder = builder
-    # examples = ['0.1 + 0.1 = x', '0.06 + 0.08',
-    #             '0.1 + 0.03', '0.09 + 0.06',
-    #             '0.1 + 0.09', '0.08 + 0.07',
-    #             '0.08 + 0.09', '0.09 + 0.06',
-    #             '0.07 + 0.1', '0.09 + 0.08']
-    # examples_solutions = {'0.1 + 0.1 = x': 'x = 0.2', '0.06 + 0.08': 0.14,
-    #                       '0.1 + 0.03': 0.13, '0.09 + 0.06': 0.15,
-    #                       '0.1 + 0.09': 0.19, '0.08 + 0.07': 0.15,
-    #                       '0.08 + 0.09': 0.17, '0.07 + 0.1': 0.17,
-    #                       '0.09 + 0.08': 0.17}
-    builder = QuadraticPDFBuilder()
+    builder = LinearPDFBuilder()
     director.builder = builder
 
-    examples = [
-        '-x^2 + 0x + 1 > 0',
-        '2x^2 + 5x + 2 >= 0',
-        'x^2 + 2x + -3 < 0',
-        '-2x^2 + 3x + 0 <= 0',
-        '-x^2 + -5x + -4 = 0',
-        'x^2 - 2x + 1 = 0',
-        'x^2 - 2x + 1 > 0',
-        'x^2 + x + 1 > 0'
-    ]
+    linear = ['3x + 1 <= 2x - 2', '2x - 3 >= 3x', '3x - 1 < 3',
+              '-2x - 3 > -x + 2', '3x - 1 = -x + 3', '-2x = 3x - 2',
+              '2x = 2x']
 
-    examples_solutions = {
-        '-x^2 + 0x + 1 > 0': {'roots': (-1.0, 1.0), 'parabola_direction': 'down', 'delta': 4},
-        '2x^2 + 5x + 2 >= 0': {'roots': (-0.5, -2.0), 'parabola_direction': 'up', 'delta': 9},
-        'x^2 + 2x + -3 < 0': {'roots': (1.0, -3.0), 'parabola_direction': 'up', 'delta': 16},
-        '-2x^2 + 3x + 0 <= 0': {'roots': (0.0, 1.5), 'parabola_direction': 'down', 'delta': 9},
-        '-x^2 + -5x + -4 = 0': {'roots': (-4.0, -1.0), 'parabola_direction': 'down', 'delta': 9},
-        'x^2 - 2x + 1 = 0': {'roots': (1.0,), 'parabola_direction': 'up', 'delta': 0},
-        'x^2 - 2x + 1 > 0': {'roots': (1.0,), 'parabola_direction': 'up', 'delta': 0},
-        'x^2 + x + 1 > 0': {'roots': "No real roots, complex roots present", 'parabola_direction': 'up', 'delta': -3}
-    }
-
-    director.build_exercises(title="Exercises", exercises=examples, filename="exercises")
-    director.build_solutions(title="Solutions", exercises=examples_solutions, filename="solutions")
+    director.build_exercises(title="Exercises", exercises=linear, filename="exercises")
+    # director.build_solutions(title="Solutions", exercises=examples_solutions, filename="solutions")
