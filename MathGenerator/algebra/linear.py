@@ -151,6 +151,7 @@ class SingleLinearFactory(LinearFactory):
         solutions = {}
         for exercise in exercises:
 
+            self.operator = re.findall(r"(<=|>=|<|>|=)", exercise)[0]
             # Divide exercise by lef, right side
             parts = exercise.split(f" {self.operator} ")
             left_side, right_side = parts[0], parts[1]
