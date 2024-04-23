@@ -54,10 +54,10 @@ class PDFBuilder(ABC):
         self.doc.preamble.append(self.header)
         self.doc.change_document_style("header")
 
-    @abstractmethod
-    def insert_header(self, title: str) -> None:
+    def insert_title(self, title: str) -> None:
         """Inserts the title into the PDF."""
-        pass
+        with self.doc.create(MiniPage(align='c')):
+            self.doc.append(LargeText(bold(title)))
 
     @abstractmethod
     def insert_exercise(self, numerator: int, exercise: str) -> None:
@@ -88,10 +88,6 @@ class ArithmeticPDFBuilder(PDFBuilder):
     and provides the resulting product.
     """
 
-    def insert_header(self, title) -> None:
-        with self.doc.create(MiniPage(align='c')):
-            self.doc.append(LargeText(bold(title)))
-
     def insert_exercise(self, numerator: int, exercise: str) -> None:
 
         with self.doc.create(
@@ -110,9 +106,6 @@ class ArithmeticPDFBuilder(PDFBuilder):
 
 
 class QuadraticPDFBuilder(PDFBuilder):
-    def insert_header(self, title) -> None:
-        with self.doc.create(MiniPage(align='c')):
-            self.doc.append(LargeText(bold(title)))
 
     def insert_exercise(self, numerator: int, exercise: str) -> None:
         with self.doc.create(
@@ -161,7 +154,7 @@ class Director:
         Constructs a PDF document with exercises, including
         a title, a series of exercises, and a header.
         """
-        self.builder.insert_header(title=title)
+        self.builder.insert_title(title=title)
         for i, exercise in enumerate(exercises, 1):
             self.builder.insert_exercise(numerator=i, exercise=exercise)
         self.builder.generate(filename)
@@ -170,7 +163,7 @@ class Director:
         """
         Constructs a PDF document with solutions, including a title, a series of exercises, and a header.
         """
-        self.builder.insert_header(title=title)
+        self.builder.insert_title(title=title)
         for i, (exercise, solution) in enumerate(exercises.items(), 1):
             self.builder.insert_solution(numerator=i, exercise=exercise, solution=solution)
         self.builder.generate(filename)
