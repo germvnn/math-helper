@@ -1,7 +1,8 @@
 import argparse
 from MathGenerator.arithmetic import factories as arithmetic
 import MathGenerator.algebra.quadratic as quadratic
-from PDFGenerator.builder import Director, ArithmeticPDFBuilder, QuadraticPDFBuilder
+import MathGenerator.algebra.linear as linear
+from PDFGenerator.builder import Director, ArithmeticPDFBuilder, QuadraticPDFBuilder, LinearPDFBuilder
 
 
 class Factory:
@@ -34,7 +35,13 @@ class Factory:
             'qinequationl': (quadratic.QuadraticInequalityLessFactory, QuadraticPDFBuilder),
             'qinequationg': (quadratic.QuadraticInequalityGreaterFactory, QuadraticPDFBuilder),
             'qequalless': (quadratic.QuadraticEqualLessFactory, QuadraticPDFBuilder),
-            'qequalgreater': (quadratic.QuadraticEqualGreaterFactory, QuadraticPDFBuilder)
+            'qequalgreater': (quadratic.QuadraticEqualGreaterFactory, QuadraticPDFBuilder),
+            'linear': (linear.SingleLinearFactory, LinearPDFBuilder),
+            'lequation': (linear.SingleLinearEquationFactory, LinearPDFBuilder),
+            'linequationl': (linear.SingleLinearInequalityLessFactory, LinearPDFBuilder),
+            'linequationg': (linear.SingleLinearInequalityGreaterFactory, LinearPDFBuilder),
+            'lequalless': (linear.SingleLinearEqualLessFactory, LinearPDFBuilder),
+            'lequalgreater': (linear.SingleLinearEqualGreaterFactory, LinearPDFBuilder)
         }
         factory_class, builder_class = factories[operation]
         return factory_class(), builder_class()
@@ -66,7 +73,13 @@ def main():
         'qinequationl',
         'qinequationg',
         'qequalless',
-        'qequalgreater'],
+        'qequalgreater',
+        'linear',
+        'lequation',
+        'linequationl',
+        'linequationg',
+        'lequalless',
+        'lequalgreater',],
                         required=True, help='Type of operation')
     parser.add_argument('-level', type=int, required=True, help='Difficulty level of the exercises')
     parser.add_argument('-amount', type=int, required=True, help='Amount of exercises to generate')
