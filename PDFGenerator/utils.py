@@ -83,6 +83,53 @@ def quadratic_solution_string(roots, delta):
 class Plot:
 
     @staticmethod
+    def path(numerator):
+        return os.path.join(os.path.dirname(__file__), f'plot{numerator}.png')
+
+    @staticmethod
+    def linear(numerator: int, solution: str) -> bool:
+        # Rozpoznaj wartość x i operator z rozwiązania
+        match = re.match(r"x\s*([<>=]+)\s*([-+]?[\d.]+)", solution)
+        if match:
+            operator = match.group(1)
+            x_value = float(match.group(2))
+        else:
+            return False
+
+        plt.figure(figsize=(6, 1))
+        ax = plt.gca()
+
+        # Adjust the limits and remove y-axis
+        plt.xlim(x_value - 5, x_value + 5)
+        plt.ylim(-1, 1)  # Seems to be useless, but arrows stops working without it
+        ax.axes.yaxis.set_visible(False)
+
+        # Draw a line for the x-axis
+        plt.axhline(0, color='black', lw=1)
+
+        scatter_kwargs = {
+            'x': x_value,
+            'y': 0,
+            's': 75,  # size of the marker
+            'edgecolors': 'red',
+            'facecolor': 'red' if '=' in solution else None,
+            'linewidths': 1.5,
+            'marker': 'o',
+        }
+        plt.scatter(**scatter_kwargs)  # Red circle no fill
+
+        arrow_kwargs = {'linewidth': 2.5, 'head_width': 0.25, 'head_length': 0.5, 'fc': 'blue', 'ec': 'blue'}
+        # Add arrows indicating the inequality
+        if '>' in operator:
+            plt.arrow(x_value + 0.17, 0, 4, 0, **arrow_kwargs)
+        if '<' in operator:
+            plt.arrow(x_value - 0.13, 0, -4, 0, **arrow_kwargs)
+        plt.xlabel('x')
+        plt.grid(False)
+        plt.savefig(Plot.path(numerator=numerator))
+        return True
+
+    @staticmethod
     def quadratic(numerator: int, exercise: str, solution: dict):
         a, b, c = extract_quadratic_coefficients(exercise)
 
@@ -136,7 +183,7 @@ class Plot:
                 plt.fill_between(x, y, 0, **fill_kwargs)
 
         plt.legend()
-        plt.savefig(os.path.join(os.path.dirname(__file__), f'plot{numerator}.png'))
+        plt.savefig(Plot.path(numerator=numerator))
 
     @staticmethod
     def remove():
