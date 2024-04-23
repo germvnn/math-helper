@@ -58,6 +58,8 @@ def test_linear_generate(factory, level):
      ['-x - 2 <= -1'], {'-x - 2 <= -1': 'x >= -1.0'}),
     (SingleLinearEqualGreaterFactory,
      ['10x - 20 >= 8x'], {'10x - 20 >= 8x': 'x >= 10.0'}),
+    (SingleLinearEqualLessFactory,
+     ['-3x - 3 <= -2x - 3'], {'-3x - 3 <= -2x - 3': 'x >= 0.0'})
 ])
 def test_linear_solve(factory, exercises, expected):
     factory = factory()

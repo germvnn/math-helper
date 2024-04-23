@@ -131,8 +131,7 @@ class SingleLinearFactory(LinearFactory):
                 case 'precise':
                     c = self.number_generator(level)
                     d = self.number_generator(level)
-                    # Make sure that exercise is not identity
-                    while a == c:
+                    while a == c:  # Make sure that exercise is not identity
                         c = self.number_generator(level)
                 case 'identity':
                     c = a
@@ -140,7 +139,7 @@ class SingleLinearFactory(LinearFactory):
                 case 'no solution':
                     c = a
                     d = b
-                    while d == b:
+                    while d == b:  # Make sure that exercise has no solution
                         d = self.number_generator(level)
                 case _:
                     raise ValueError("Invalid task type")
@@ -148,35 +147,39 @@ class SingleLinearFactory(LinearFactory):
             self.operator = None if self.random_operator else self.operator
         return exercises
 
-    # TODO: Fix results when '<' -> '>' etc.
     def solve(self, exercises):
         solutions = {}
         for exercise in exercises:
 
+            # Divide exercise by lef, right side
             parts = exercise.split(f" {self.operator} ")
             left_side, right_side = parts[0], parts[1]
 
-            a, b = extract_coefficients(''.join(left_side))
-            c, d = extract_coefficients(''.join(right_side))
+            # Get coefficients values
+            a1, b1 = extract_coefficients(''.join(left_side))
+            a2, b2 = extract_coefficients(''.join(right_side))
 
-            A = a - c
-            B = d - b
+            # Move ax to left_side, b to right_side
+            a = a1 - a2
+            b = b2 - b1
 
-            if A == 0:
-                if B == 0:
-                    solutions[exercise] = 'identity (all x)'
+            if a == 0:
+                if b == 0:
+                    solutions[exercise] = 'identity (all x)'  # 0 = 0
                 else:
-                    solutions[exercise] = 'no solution'
+                    solutions[exercise] = 'no solution'  # 0 = {non_zero_value}
             else:
-                x_solution = B / A
+                x_solution = b / a if b / a != -0.0 else 0.0  # I love operations on floats
                 if self.operator == '=':
                     solutions[exercise] = f'x = {x_solution}'
                 elif self.operator in ['>', '<', '>=', '<=']:
                     # Reverse the operator if A is negative
-                    if A < 0:
+                    if a < 0:
                         solutions[exercise] = f'x {reverse_operator(self.operator)} {x_solution}'
                     else:
                         solutions[exercise] = f'x {self.operator} {x_solution}'
+                else:
+                    raise ValueError("Invalid operator")
 
         return solutions
 
@@ -233,6 +236,6 @@ class LinearFunctionFactory(LinearFactory):
 if __name__ == "__main__":
     factory = SingleLinearFactory(operator_symbol="<=")
     exe = factory.generate(level=1, amount=15)
-    sol = factory.solve(['x - 2 <= 2'])
+    sol = factory.solve(exe)
     print(f"Exercises: {exe}")
     print(f"Sol: {sol}")
