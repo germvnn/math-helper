@@ -62,6 +62,22 @@ def linear_exercise_string(numerator, exercise):
     return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$")
 
 
+def linear_solution_string(solution):
+    if 'identity' in solution:
+        # Here the text is outside math mode
+        solution_text = r"x~\in~\textbf{R}"
+    elif 'no solution' in solution:
+        # Here the text is outside math mode
+        solution_text = r"x~\in~\emptyset"
+    else:
+        # Here the entire solution string should be in math mode
+        solution = solution.replace('<=', r'\leq ')
+        solution = solution.replace('>=', r'\geq ')
+        solution_text = solution.replace(' ', '~')  # Replace spaces with tilde for non-breaking spaces
+
+    return NoEscape(r'\begin{center}\Large $' + decimal_to_fraction(solution_text) + r'$ \end{center}')
+
+
 def quadratic_exercise_string(numerator, exercise):
     exercise = exercise.replace('<=', r'\leq')
     exercise = exercise.replace('>=', r'\geq')
@@ -94,7 +110,6 @@ class Plot:
 
     @staticmethod
     def linear(numerator: int, solution: str) -> bool:
-        # Rozpoznaj wartość x i operator z rozwiązania
         match = re.match(r"x\s*([<>=]+)\s*([-+]?[\d.]+)", solution)
         if match:
             operator = match.group(1)
@@ -132,7 +147,7 @@ class Plot:
             plt.arrow(x_value - 0.13, 0, -4, 0, **arrow_kwargs)
         plt.xlabel('x')
         plt.grid(False)
-        plt.savefig(Plot.path(numerator=numerator))
+        plt.savefig(Plot.path(numerator=numerator), bbox_inches='tight')
         return True
 
     @staticmethod
@@ -197,3 +212,7 @@ class Plot:
 
         for file_path in files_to_remove:
             os.remove(file_path)
+
+
+if __name__ == "__main__":
+    Plot.linear(1, "x <= 2")

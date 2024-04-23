@@ -115,12 +115,11 @@ class QuadraticPDFBuilder(PDFBuilder):
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
         with self.doc.create(
-                Section(utils.quadratic_exercise_string(numerator=numerator,
-                                                        exercise=exercise), numbering=False)
+            Section(utils.quadratic_exercise_string(numerator=numerator,exercise=exercise), numbering=False)
         ):
             self.doc.append(utils.quadratic_solution_string(roots=solution['roots'],
                                                             delta=solution['delta']))
-            img_path = os.path.join(os.path.dirname(__file__), f'plot{numerator}.png')
+            img_path = utils.Plot.path(numerator=numerator)
             utils.Plot.quadratic(numerator=numerator,
                                  exercise=exercise,
                                  solution=solution)
@@ -137,7 +136,16 @@ class LinearPDFBuilder(PDFBuilder):
             pass
 
     def insert_solution(self, numerator: int, exercise: str, solution) -> None:
-        pass
+        with self.doc.create(
+            Section(utils.linear_exercise_string(numerator=numerator, exercise=exercise), numbering=False)
+        ):
+            self.doc.append(utils.linear_solution_string(solution=solution))
+            if utils.Plot.linear(numerator=numerator, solution=solution):
+                img_path = utils.Plot.path(numerator=numerator)
+                with self.doc.create(Figure(position="h!")) as plot:
+                    plot.add_image(img_path, width=NoEscape(r'0.75\textwidth'))
+            else:
+                self.doc.append(NoEscape(r"\vspace{4.128cm}"))
 
 
 class Director:
@@ -187,8 +195,17 @@ if __name__ == "__main__":
     director.builder = builder
 
     linear = ['3x + 1 <= 2x - 2', '2x - 3 >= 3x', '3x - 1 < 3',
-              '-2x - 3 > -x + 2', '3x - 1 = -x + 3', '-2x = 3x - 2',
-              '2x = 2x']
+              '-2x - 3 > -x + 2', '3x - 1 = -x + 3', '-2x = 3x - 2']
+
+    linear_solutions = {
+        '3x + 1 <= 2x - 2': 'x <= -3',
+        '2x - 3 >= 3x': 'x <= -3',
+        '3x - 1 < 3': 'x < 4/3',
+        '-2x - 3 > -x + 2': 'x < -5',
+        '3x - 1 = -x + 3': 'x = 1',
+        'x = x': 'identity all x',
+        'x - 1 = x + 2': 'no solution'
+    }
 
     director.build_exercises(title="Exercises", exercises=linear, filename="exercises")
-    # director.build_solutions(title="Solutions", exercises=examples_solutions, filename="solutions")
+    director.build_solutions(title="Solutions", exercises=linear_solutions, filename="solutions")
