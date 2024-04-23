@@ -56,14 +56,18 @@ def solution_string(numerator, exercise, comparison_operator, solution):
     return NoEscape(rf"{numerator}.~~~{latexify(exercise)} {comparison_operator} {latexify(solution)}")
 
 
-def quadratic_exercise_string(numerator, exercise, end_line):
+def linear_exercise_string():
+    pass
+
+
+def quadratic_exercise_string(numerator, exercise):
     exercise = exercise.replace('<=', r'\leq')
     exercise = exercise.replace('>=', r'\geq')
     # TODO: Temporary solution. Parentheses must be implemented in generator
     a, b, c = extract_quadratic_coefficients(exercise)
     for coeff in [b, c]:
         exercise = exercise.replace(str(coeff), f"({coeff})") if coeff < 0 else exercise
-    return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$ {end_line}")
+    return NoEscape(rf"{numerator}.~~~$${latexify(decimal_to_fraction(exercise))}$$")
 
 
 def quadratic_solution_string(roots, delta):
