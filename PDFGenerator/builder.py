@@ -124,7 +124,7 @@ class QuadraticPDFBuilder(PDFBuilder):
                                  exercise=exercise,
                                  solution=solution)
             with self.doc.create(Figure(position="h!")) as plot:
-                plot.add_image(img_path, width=NoEscape(r'0.57\textwidth'))
+                plot.add_image(img_path, width=NoEscape(rf'{const.QUADRATIC_TEXTWIDTH}\textwidth'))
 
 
 class LinearPDFBuilder(PDFBuilder):
@@ -143,9 +143,9 @@ class LinearPDFBuilder(PDFBuilder):
             if utils.Plot.linear(numerator=numerator, solution=solution):
                 img_path = utils.Plot.path(numerator=numerator)
                 with self.doc.create(Figure(position="h!")) as plot:
-                    plot.add_image(img_path, width=NoEscape(r'0.75\textwidth'))
+                    plot.add_image(img_path, width=NoEscape(fr'{const.LINEAR_TEXTWIDTH}\textwidth'))
             else:
-                self.doc.append(NoEscape(r"\vspace{4.128cm}"))
+                self.doc.append(NoEscape(fr"\vspace{{{const.LINEAR_NO_PLOT_BREAK}}}"))
 
 
 class Director:
