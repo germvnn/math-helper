@@ -4,42 +4,31 @@ import re
 from MathGenerator.abstracts import ExerciseFactory
 
 
-def format_terms(a, b, variable='x'):
-    """
-    Formats the terms for an equation based on the provided coefficients.
-
-    :param a: Coefficient for the variable term.
-    :param b: Coefficient for the constant term.
-    :param variable: The variable of the equation, default 'x'.
-    :return: Formatted part of the equation as a string.
-    """
-    # Handle the variable term
+def format_variable_term(a, variable='x'):
     if a == 0:
-        term_a = ''
+        return ''
     elif a == 1:
-        term_a = f"{variable}"
+        return f"{variable}"
     elif a == -1:
-        term_a = f"-{variable}"
+        return f"-{variable}"
     else:
-        term_a = f"{a}{variable}"
+        return f"{a}{variable}"
 
-    # Handle the constant term
+
+def format_constant_term(b):
     if b == 0:
-        term_b = ''
-    else:
-        sign = '-' if b < 0 else '+'
-        abs_b = abs(b)
-        term_b = f" {sign} {abs_b}"
+        return ''
+    sign = '-' if b < 0 else '+'
+    return f" {sign} {abs(b)}"
 
-    # Combine the terms
-    if a == 0 and b == 0:
+
+def format_terms(a, b, variable='x'):
+    term_a = format_variable_term(a, variable)
+    term_b = format_constant_term(b)
+
+    if not term_a and not term_b:
         return "0"
-    elif a == 0:
-        return f"{b}"
-    elif b == 0:
-        return term_a
-    else:
-        return f"{term_a}{term_b}"
+    return f"{term_a}{term_b}".strip()
 
 
 def extract_coefficients(expression: str):
@@ -108,81 +97,75 @@ class SingleLinearFactory(LinearFactory):
         self.random_operator = True if self.operator is None else False
 
     # TODO: Consider fractions for higher levels
+
     def generate(self, level: int, amount: int):
         exercises = []
         for _ in range(amount):
-            # Assign operator if not provided
             self.operator = random.choice(['=', '>', '<', '>=', '<=']) if self.random_operator else self.operator
+            task_type = self._choose_task_type()
 
-            # TODO: Think about this solution
-            if self.operator == '=':
-                task_type = random.choices(
-                    ['precise', 'identity', 'no solution'],
-                    weights=[70, 10, 20],
-                )[0]
+            if task_type == 'precise':
+                a, b, c, d = self._generate_precise(level)
+            elif task_type == 'identity':
+                a, b, c, d = self._generate_identity(level)
+            elif task_type == 'no solution':
+                a, b, c, d = self._generate_no_solution(level)
             else:
-                task_type = 'precise'
+                raise ValueError("Invalid task type")
 
-            a = self.number_generator(level)
-            b = self.number_generator(level)
-
-            # Match number generator based on task type
-            match task_type:
-                case 'precise':
-                    c = self.number_generator(level)
-                    d = self.number_generator(level)
-                    while a == c:  # Make sure that exercise is not identity
-                        c = self.number_generator(level)
-                case 'identity':
-                    c = a
-                    d = b
-                case 'no solution':
-                    c = a
-                    d = b
-                    while d == b:  # Make sure that exercise has no solution
-                        d = self.number_generator(level)
-                case _:
-                    raise ValueError("Invalid task type")
             exercises.append(f"{format_terms(a, b)} {self.operator} {format_terms(c, d)}")
-            self.operator = None if self.random_operator else self.operator
         return exercises
+
+    def _generate_precise(self, level):
+        a = self.number_generator(level)
+        b = self.number_generator(level)
+        c = self.number_generator(level)
+        d = self.number_generator(level)
+        while a == c:  # Avoid identity cases
+            c = self.number_generator(level)
+        return a, b, c, d
+
+    def _generate_identity(self, level):
+        a = self.number_generator(level)
+        b = self.number_generator(level)
+        return a, b, a, b
+
+    def _generate_no_solution(self, level):
+        a = self.number_generator(level)
+        b = self.number_generator(level)
+        c = a
+        d = self.number_generator(level)
+        while d == b:  # Ensure no solution
+            d = self.number_generator(level)
+        return a, b, c, d
+
+    def _choose_task_type(self):
+        if self.operator == '=':
+            return random.choices(['precise', 'identity', 'no solution'], weights=[70, 10, 20])[0]
+        return 'precise'
 
     def solve(self, exercises):
         solutions = {}
         for exercise in exercises:
+            self.operator = re.search(r"(<=|>=|<|>|=)", exercise).group(0)
+            left_side, right_side = exercise.split(f" {self.operator} ")
 
-            self.operator = re.findall(r"(<=|>=|<|>|=)", exercise)[0]
-            # Divide exercise by lef, right side
-            parts = exercise.split(f" {self.operator} ")
-            left_side, right_side = parts[0], parts[1]
+            a1, b1 = extract_coefficients(left_side)
+            a2, b2 = extract_coefficients(right_side)
 
-            # Get coefficients values
-            a1, b1 = extract_coefficients(''.join(left_side))
-            a2, b2 = extract_coefficients(''.join(right_side))
-
-            # Move ax to left_side, b to right_side
             a = a1 - a2
             b = b2 - b1
 
-            if a == 0:
-                if b == 0:
-                    solutions[exercise] = 'identity (all x)'  # 0 = 0
-                else:
-                    solutions[exercise] = 'no solution'  # 0 = {non_zero_value}
-            else:
-                x_solution = b / a if b / a != -0.0 else 0.0  # I love operations on floats
-                if self.operator == '=':
-                    solutions[exercise] = f'x = {x_solution}'
-                elif self.operator in ['>', '<', '>=', '<=']:
-                    # Reverse the operator if A is negative
-                    if a < 0:
-                        solutions[exercise] = f'x {reverse_operator(self.operator)} {x_solution}'
-                    else:
-                        solutions[exercise] = f'x {self.operator} {x_solution}'
-                else:
-                    raise ValueError("Invalid operator")
-
+            solutions[exercise] = self._solve_linear(a, b)
         return solutions
+
+    def _solve_linear(self, a, b):
+        if a == 0:
+            return 'identity (all x)' if b == 0 else 'no solution'
+
+        x_solution = b / a if b / a != -0.0 else 0.0
+        operator = reverse_operator(self.operator) if a < 0 else self.operator
+        return f'x {operator} {x_solution}' if self.operator != '=' else f'x = {x_solution}'
 
 
 class SingleLinearEquationFactory(SingleLinearFactory):
