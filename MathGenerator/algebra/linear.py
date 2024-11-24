@@ -3,6 +3,14 @@ import re
 
 from MathGenerator.abstracts import ExerciseFactory
 
+def format_terms(a, b, variable='x'):
+    term_a = format_variable_term(a, variable)
+    term_b = format_constant_term(b)
+
+    if not term_a and not term_b:
+        return "0"
+    return f"{term_a}{term_b}".strip()
+
 
 def format_variable_term(a, variable='x'):
     if a == 0:
@@ -20,15 +28,6 @@ def format_constant_term(b):
         return ''
     sign = '-' if b < 0 else '+'
     return f" {sign} {abs(b)}"
-
-
-def format_terms(a, b, variable='x'):
-    term_a = format_variable_term(a, variable)
-    term_b = format_constant_term(b)
-
-    if not term_a and not term_b:
-        return "0"
-    return f"{term_a}{term_b}".strip()
 
 
 def extract_coefficients(expression: str):
